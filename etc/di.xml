@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference
+        for="SnowIO\ExtendedSalesRepositories\Api\Data\AdditionalInformationFieldInterface"
+        type="SnowIO\ExtendedSalesRepositories\Model\AdditionalInformationField" />
+
+    <type name="Magento\Sales\Api\OrderPaymentRepositoryInterface">
+        <plugin name="OrderPaymentRepositoryExtensionPlugin" type="SnowIO\ExtendedSalesRepositories\Plugin\OrderPaymentRepositoryExtensionPlugin" disabled="false" />
+    </type>
+    <type name="Magento\Sales\Api\OrderRepositoryInterface">
+        <plugin name="OrderRepositoryExtensionPlugin" type="SnowIO\ExtendedSalesRepositories\Plugin\OrderRepositoryExtensionPlugin" disabled="false" />
+    </type>
+</config>
