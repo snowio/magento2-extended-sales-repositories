@@ -20,15 +20,9 @@ class AdditionalPaymentInformationExtender
     public function extendPayment(OrderPaymentInterface $payment)
     {
         $additionalInformation = $payment->getAdditionalInformation();
+        
         if (!empty($additionalInformation)) {
-            $paymentKeyValuePairs = [];
-
-            foreach ($additionalInformation as $key => $value) {
-                $paymentKeyValuePair = $this->paymentKeyValuePairFactory->create();
-                $paymentKeyValuePair->setName($key)
-                    ->setValue($value);
-                $paymentKeyValuePairs[] = $paymentKeyValuePair;
-            }
+            $fieldSet = AdditionalInformationField::createSet($additionalInformation);
 
             $paymentExtensionAttributes = $payment->getExtensionAttributes();
             if (null === $paymentExtensionAttributes) {
@@ -36,7 +30,7 @@ class AdditionalPaymentInformationExtender
                 $payment->setExtensionAttributes($paymentExtensionAttributes);
             }
 
-            $paymentExtensionAttributes->setAdditionalInformation($paymentKeyValuePairs);
+            $paymentExtensionAttributes->setAdditionalInformation($fieldSet);
         }
     }
 }
