@@ -6,14 +6,10 @@ use Magento\Sales\Api\Data\OrderPaymentExtensionFactory;
 
 class AdditionalPaymentInformationExtender
 {
-    private $paymentKeyValuePairFactory;
     private $orderPaymentExtensionFactory;
 
-    public function __construct(
-        AdditionalInformationFieldFactory $paymentKeyValuePairFactory,
-        OrderPaymentExtensionFactory $orderPaymentExtensionFactory
-    ) {
-        $this->paymentKeyValuePairFactory = $paymentKeyValuePairFactory;
+    public function __construct(OrderPaymentExtensionFactory $orderPaymentExtensionFactory)
+    {
         $this->orderPaymentExtensionFactory = $orderPaymentExtensionFactory;
     }
 
