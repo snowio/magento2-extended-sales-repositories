@@ -21,14 +21,14 @@ interface AdditionalInformationFieldInterface
     /**
      * Get object value
      *
-     * @return string
+     * @return mixed
      */
     public function getValue();
 
     /**
      * Set object value
      *
-     * @param string $value
+     * @param mixed $value
      * @return $this
      */
     public function setValue($value);
