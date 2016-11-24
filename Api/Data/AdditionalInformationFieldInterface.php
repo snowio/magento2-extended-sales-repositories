@@ -4,14 +4,14 @@ namespace SnowIO\ExtendedSalesRepositories\Api\Data;
 interface AdditionalInformationFieldInterface
 {
     /**
-     * Get object name
+     * Get field name
      *
      * @return string
      */
     public function getName();
 
     /**
-     * Set object name
+     * Set field name
      *
      * @param string $name
      * @return $this
@@ -19,14 +19,14 @@ interface AdditionalInformationFieldInterface
     public function setName($name);
 
     /**
-     * Get object value
+     * Get field value
      *
      * @return mixed
      */
     public function getValue();
 
     /**
-     * Set object value
+     * Set field value
      *
      * @param mixed $value
      * @return $this
