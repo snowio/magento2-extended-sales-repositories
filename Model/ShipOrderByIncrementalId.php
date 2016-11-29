@@ -8,7 +8,6 @@ use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Api\ShipOrderInterface;
 use SnowIO\ExtendedSalesRepositories\Api\ShipOrderByIncrementalIdInterface;
 
-
 class ShipOrderByIncrementalId implements ShipOrderByIncrementalIdInterface
 {
 
