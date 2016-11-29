@@ -6,7 +6,7 @@
 
     <preference
             for="SnowIO\ExtendedSalesRepositories\Api\ShipOrderByIncrementalIdInterface"
-            type="SnowIO\ExtendedSalesRepsitories\Model\ShipOrderByIncrementalId" />
+            type="SnowIO\ExtendedSalesRepositories\Model\ShipOrderByIncrementalId" />
 
     <type name="Magento\Sales\Api\OrderPaymentRepositoryInterface">
         <plugin name="OrderPaymentRepositoryExtensionPlugin" type="SnowIO\ExtendedSalesRepositories\Plugin\OrderPaymentRepositoryExtensionPlugin" disabled="false" />
