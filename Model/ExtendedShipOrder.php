@@ -1,5 +1,5 @@
 <?php
-namespace SnowIO\ExtendedSalesRepositories\Api\Data;
+namespace SnowIO\ExtendedSalesRepositories\Model;
 
 use Magento\Framework\Api\Filter;
 use Magento\Framework\Api\Search\FilterGroup;
@@ -21,20 +21,6 @@ class ExtendedShipOrder implements ExtendedShipOrderInterface
         $this->shipOrder = $shipOrder;
     }
 
-
-    /**
-     * Creates new Shipment for given Order.
-     *
-     * @param string $orderIncrementId
-     * @param \Magento\Sales\Api\Data\ShipmentItemCreationInterface[] $items
-     * @param bool $notify
-     * @param bool $appendComment
-     * @param \Magento\Sales\Api\Data\ShipmentCommentCreationInterface|null $comment
-     * @param \Magento\Sales\Api\Data\ShipmentTrackCreationInterface[] $tracks
-     * @param \Magento\Sales\Api\Data\ShipmentPackageCreationInterface[] $packages
-     * @param \Magento\Sales\Api\Data\ShipmentCreationArgumentsInterface|null $arguments
-     * @return int Id of created Shipment.
-     */
     public function execute(
         $orderIncrementId,
         array $items = [],
@@ -46,7 +32,7 @@ class ExtendedShipOrder implements ExtendedShipOrderInterface
         \Magento\Sales\Api\Data\ShipmentCreationArgumentsInterface $arguments = null
     ) {
         $order = $this->loadOrderByIncrementId($orderIncrementId);
-        $this->shipOrder->execute(
+        return $this->shipOrder->execute(
             $order->getEntityId(),
             $items,
             $notify,
