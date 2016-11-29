@@ -7,7 +7,7 @@ namespace SnowIO\ExtendedSalesRepositories\Api;
  *
  * @api
  */
-interface ExtendedShipOrderInterface
+interface ShipOrderByIncrementalIdInterface
 {
     /**
      * Creates new Shipment for given Order.
