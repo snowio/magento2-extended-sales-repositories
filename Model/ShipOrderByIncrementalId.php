@@ -62,6 +62,6 @@ class ShipOrderByIncrementalId implements ShipOrderByIncrementalIdInterface
             throw new \LogicException("No order exists with increment ID '$incrementId'.");
         }
 
-        return $order[0];
+        return reset($order);
     }
 }
