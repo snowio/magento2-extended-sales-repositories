@@ -1,5 +1,7 @@
 <?php
 
+namespace SnowIO\ExtendedSalesRepositories\Test\Integration\Plugin;
+
 use Magento\Sales\Api\Data\ShipmentInterface;
 use Magento\Sales\Api\Data\ShipmentItemInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
@@ -42,5 +44,4 @@ class ShipmentRepositoryTest extends \PHPUnit_Framework_TestCase
         $shipment->setShipmentStatus(\Magento\Sales\Model\Order\Shipment::STATUS_NEW);
         $shipment->save();
     }
-
 }
