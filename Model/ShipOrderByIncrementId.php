@@ -6,9 +6,9 @@ use Magento\Framework\Api\Search\FilterGroup;
 use Magento\Framework\Api\SearchCriteria;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Api\ShipOrderInterface;
-use SnowIO\ExtendedSalesRepositories\Api\ShipOrderByIncrementalIdInterface;
+use SnowIO\ExtendedSalesRepositories\Api\ShipOrderByIncrementIdInterface;
 
-class ShipOrderByIncrementalId implements ShipOrderByIncrementalIdInterface
+class ShipOrderByIncrementId implements ShipOrderByIncrementIdInterface
 {
 
     private $shipOrder;
