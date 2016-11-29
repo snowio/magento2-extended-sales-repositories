@@ -12,7 +12,8 @@
     "require": {
         "php": ">=5.6",
         "magento/module-sales": "^100",
-        "magento/framework": "^100"
+        "magento/framework": "^100",
+        "snowio/magento2-sales-backport": "^1.0.0"
     },
     "autoload": {
         "files": [ "registration.php" ],
