@@ -11,8 +11,8 @@
     ],
     "require": {
         "php": ">=5.6",
-        "magento/module-sales": "^101.0.2",
-        "magento/framework": "^100.1.2"
+        "magento/module-sales": "^100.1.2|^101.0.2",
+        "magento/framework": "^100.1.2|^101.0.2"
     },
     "autoload": {
         "files": [ "registration.php" ],
