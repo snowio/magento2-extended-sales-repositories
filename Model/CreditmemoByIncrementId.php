@@ -4,9 +4,12 @@ namespace SnowIO\ExtendedSalesRepositories\Model;
 use Magento\Framework\Api\Filter;
 use Magento\Framework\Api\Search\FilterGroup;
 use Magento\Framework\Api\SearchCriteria;
+use Magento\Sales\Api\Data\CreditmemoInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Api\CreditmemoManagementInterface;
 use Magento\Sales\Api\CreditmemoRepositoryInterface;
+use Magento\Sales\Model\Order;
+use Magento\Sales\Model\Order\Creditmemo;
 use Magento\Sales\Model\Order\CreditmemoFactory;
 use SnowIO\ExtendedSalesRepositories\Api\CreditmemoByIncrementIdInterface;
 
@@ -46,26 +49,55 @@ class CreditmemoByIncrementId implements CreditmemoByIncrementIdInterface
      * Create a new creditmemo using increment_id and then create refund
      *
      * @param string $orderIncrementId
-     * @param \Magento\Sales\Api\Data\CreditmemoInterface $creditmemo
-     * @return \Magento\Sales\Api\Data\CreditmemoInterface
+     * @param CreditmemoInterface $creditmemo
+     * @return CreditmemoInterface
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function createAndRefund(
         $orderIncrementId,
-        \Magento\Sales\Api\Data\CreditmemoInterface $creditmemo
+        CreditmemoInterface $creditmemo
     ) {
-        /** @var \Magento\Sales\Model\Order $order */
+        /** @var Order $order */
         $order = $this->loadOrderByIncrementId($orderIncrementId);
 
-        /** @var \Magento\Sales\Api\Data\CreditmemoInterface $creditmemo */
-        $creditmemo = $this->creditmemoFactory->createByOrder($order, $adjustments = []);
-        $creditmemo->setState(\Magento\Sales\Model\Order\Creditmemo::STATE_OPEN);
+        if(!$order->canCreditmemo()) {
+            throw new \Magento\Framework\Exception\LocalizedException(
+                __("This order does not allow creation of creditmemo")
+            );
+        }
 
-        $this->creditmemoRepository->save($creditmemo);
+        /** @var CreditmemoInterface $creditmemo */
+        $newCreditmemo = $this->creditmemoFactory->createByOrder($order, [
+            'qtys' => $this->filterItemsToBeRefunded($order, $creditmemo)
+        ]);
+        $newCreditmemo->setState(Creditmemo::STATE_OPEN);
 
-        $this->creditmemoManagement->refund($creditmemo);
+        $this->creditmemoRepository->save($newCreditmemo);
 
-        return $creditmemo;
+        return $this->creditmemoManagement->refund($newCreditmemo);
+    }
+
+    /**
+     * Get the sku and qty from the input payload to decide which item and its quantity to be refunded.
+     * This allow partial creditmemo/refund
+     *
+     * @param Order $order
+     * @param CreditmemoInterface $creditmemo
+     * @return array
+     */
+    private function filterItemsToBeRefunded(Order $order, CreditmemoInterface $creditmemo)
+    {
+        $selectedItemsToRefund = [];
+        /** @var \Magento\Sales\Model\Order\Item $orderItem */
+        foreach($order->getAllItems() as $orderItem){
+            /** @var \Magento\Sales\Model\Order\Creditmemo\Item $inputItem */
+            foreach($creditmemo->getItems() as $inputItem){
+                if($orderItem->getSku() === $inputItem->getSku() && $inputItem->getQty() > 0){
+                    $selectedItemsToRefund[$orderItem->getId()] = $inputItem->getQty();
+                }
+            }
+        }
+        return $selectedItemsToRefund;
     }
 
     private function loadOrderByIncrementId(string $incrementId)
