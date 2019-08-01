@@ -12,6 +12,18 @@
             for="SnowIO\ExtendedSalesRepositories\Api\CreditmemoByOrderIncrementIdInterface"
             type="SnowIO\ExtendedSalesRepositories\Model\CreditmemoByOrderIncrementId" />
 
+    <preference
+            for="SnowIO\ExtendedSalesRepositories\Api\OrderRelatedDataRepositoryInterface"
+            type="SnowIO\ExtendedSalesRepositories\Model\OrderRelatedDataRepository" />
+
+    <preference
+            for="SnowIO\ExtendedSalesRepositories\Api\Data\OrderRelatedDataInterface"
+            type="SnowIO\ExtendedSalesRepositories\Model\OrderRelatedData" />
+
+    <preference
+            for="SnowIO\ExtendedSalesRepositories\Api\Data\OrderRelatedDataSearchResultsInterface"
+            type="Magento\Framework\Api\SearchResults" />
+
     <type name="Magento\Sales\Api\OrderRepositoryInterface">
         <plugin name="processAdditionalInformation" type="SnowIO\ExtendedSalesRepositories\Plugin\OrderRepositoryPlugin" disabled="true" />
     </type>
