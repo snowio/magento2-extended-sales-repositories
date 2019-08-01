@@ -6,8 +6,8 @@
             <resource ref="Magento_Sales::sales" />
         </resources>
     </route>
-    <route url="/V1/creditmemo/:orderIncrementId/create-and-refund" method="PUT">
-        <service class="SnowIO\ExtendedSalesRepositories\Api\CreditmemoByIncrementIdInterface" method="createAndRefund"/>
+    <route url="/V1/order/:orderIncrementId/creditmemo/create-and-refund" method="PUT">
+        <service class="SnowIO\ExtendedSalesRepositories\Api\CreditmemoByOrderIncrementIdInterface" method="createAndRefund"/>
         <resources>
             <resource ref="Magento_Sales::creditmemo" />
         </resources>

@@ -9,8 +9,8 @@
             type="SnowIO\ExtendedSalesRepositories\Model\ShipOrderByIncrementId" />
 
     <preference
-            for="SnowIO\ExtendedSalesRepositories\Api\CreditmemoByIncrementIdInterface"
-            type="SnowIO\ExtendedSalesRepositories\Model\CreditmemoByIncrementId" />
+            for="SnowIO\ExtendedSalesRepositories\Api\CreditmemoByOrderIncrementIdInterface"
+            type="SnowIO\ExtendedSalesRepositories\Model\CreditmemoByOrderIncrementId" />
 
     <type name="Magento\Sales\Api\OrderRepositoryInterface">
         <plugin name="processAdditionalInformation" type="SnowIO\ExtendedSalesRepositories\Plugin\OrderRepositoryPlugin" disabled="true" />

@@ -11,9 +11,9 @@ use Magento\Sales\Api\CreditmemoRepositoryInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Creditmemo;
 use Magento\Sales\Model\Order\CreditmemoFactory;
-use SnowIO\ExtendedSalesRepositories\Api\CreditmemoByIncrementIdInterface;
+use SnowIO\ExtendedSalesRepositories\Api\CreditmemoByOrderIncrementIdInterface;
 
-class CreditmemoByIncrementId implements CreditmemoByIncrementIdInterface
+class CreditmemoByOrderIncrementId implements CreditmemoByOrderIncrementIdInterface
 {
     /** @var CreditmemoManagementInterface */
     private $creditmemoManagement;
@@ -28,7 +28,7 @@ class CreditmemoByIncrementId implements CreditmemoByIncrementIdInterface
     private $creditmemoFactory;
 
     /**
-     * CreditmemoByIncrementId constructor.
+     * CreditmemoByOrderIncrementId constructor.
      * @param CreditmemoRepositoryInterface $creditmemoRepository
      * @param CreditmemoManagementInterface $creditmemoManagement
      * @param OrderRepositoryInterface $orderRepository

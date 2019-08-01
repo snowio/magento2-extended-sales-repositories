@@ -3,11 +3,11 @@
 namespace SnowIO\ExtendedSalesRepositories\Api;
 
 /**
- * Class CreditmemoByIncrementIdInterface
+ * Class CreditmemoByOrderIncrementIdInterface
  *
  * @api
  */
-interface CreditmemoByIncrementIdInterface extends \Magento\Framework\Api\ExtensibleDataInterface
+interface CreditmemoByOrderIncrementIdInterface extends \Magento\Framework\Api\ExtensibleDataInterface
 {
     /**
      * Creates new Creditmemo and Refund it for given Order.
