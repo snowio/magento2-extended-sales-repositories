@@ -12,4 +12,28 @@
             <resource ref="Magento_Sales::creditmemo" />
         </resources>
     </route>
+    <route url="/V1/order/:orderIncrementId/relateddata" method="GET">
+        <service class="SnowIO\ExtendedSalesRepositories\Api\OrderRelatedDataRepositoryInterface" method="getList"/>
+        <resources>
+            <resource ref="Magento_Sales::sales" />
+        </resources>
+    </route>
+    <route url="/V1/order/:orderIncrementId/relateddata/:code" method="GET">
+        <service class="SnowIO\ExtendedSalesRepositories\Api\OrderRelatedDataRepositoryInterface" method="getByOrderIncrementIdAndCode"/>
+        <resources>
+            <resource ref="Magento_Sales::sales" />
+        </resources>
+    </route>
+    <route url="/V1/order/:orderIncrementId/relateddata/:code" method="PUT">
+        <service class="SnowIO\ExtendedSalesRepositories\Api\OrderRelatedDataRepositoryInterface" method="save"/>
+        <resources>
+            <resource ref="Magento_Sales::sales" />
+        </resources>
+    </route>
+    <route url="/V1/order/:orderIncrementId/relateddata/:code" method="DELETE">
+        <service class="SnowIO\ExtendedSalesRepositories\Api\OrderRelatedDataRepositoryInterface" method="delete"/>
+        <resources>
+            <resource ref="Magento_Sales::sales" />
+        </resources>
+    </route>
 </routes>
