@@ -1,42 +1,79 @@
 <?php
 namespace SnowIO\ExtendedSalesRepositories\Plugin;
 
+use Magento\Framework\Api\ExtensionAttributesFactory;
+use Magento\Sales\Api\Data\OrderExtensionFactory;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Api\Data\OrderInterface;
-use Magento\Sales\Api\Data\OrderPaymentExtensionFactory;
+use SnowIO\ExtendedSalesRepositories\Api\Data\OrderRelatedDataInterface;
+use SnowIO\ExtendedSalesRepositories\Api\OrderRelatedDataRepositoryInterface;
 
 class OrderRepositoryPlugin
 {
-    private $orderPaymentExtensionFactory;
+    /** @var OrderRelatedDataRepositoryInterface */
+    private $orderRelatedDataRepository;
 
+    /** @var OrderExtensionFactory */
+    private $orderExtensionFactory;
 
-    public function __construct(OrderPaymentExtensionFactory $orderPaymentExtensionFactory)
+    public function __construct(
+        OrderRelatedDataRepositoryInterface $orderRelatedDataRepository,
+        ExtensionAttributesFactory $extensionAttributesFactory
+    )
     {
-        $this->orderPaymentExtensionFactory = $orderPaymentExtensionFactory;
+        $this->orderRelatedDataRepository = $orderRelatedDataRepository;
+        $this->extensionAttributesFactory = $extensionAttributesFactory;
     }
 
     /**
-     * Unset additional information to avoid web services being broken by nested array
-     * and add the additional information as a json encoded string to an extension attribute.
+     * Append Order Related Data Collection as Extension Attributes
+     *
+     * @param OrderRepositoryInterface $orderRepository
+     * @param OrderInterface $order
+     * @return OrderInterface
      */
     public function afterGet(OrderRepositoryInterface $orderRepository, OrderInterface $order)
     {
-        $payment = $order->getPayment();
-        $additionalInformation = $payment->getAdditionalInformation();
-        $additionalInformationJson = json_encode($additionalInformation);
-
-        $extensionAttributes = $payment->getExtensionAttributes();
-        if (null === $extensionAttributes) {
-            $extensionAttributes = $this->orderPaymentExtensionFactory->create();
-        }
-        $extensionAttributes->setAdditionalInformationJson($additionalInformationJson);
-        $payment->setExtensionAttributes($extensionAttributes);
-
-        if (method_exists($payment, 'unsAdditionalInformation')) {
-            $payment->unsAdditionalInformation();
-        }
-
+        $orderExtensionAttributes = $this->getRelatedDataExtensionAttributes($order);
+        $order->setExtensionAttributes($orderExtensionAttributes);
         return $order;
+    }
 
+    /**
+     * Get All Order Related Data by Increment Id and return as Extension Attributes
+     *
+     * @param $order
+     * @return \Magento\Framework\Api\ExtensionAttributesInterface
+     */
+    private function getRelatedDataExtensionAttributes($order)
+    {
+        $orderExtensionAttributes = $order->getExtensionAttributes();
+        if ($orderExtensionAttributes === null) {
+            $orderExtensionAttributes = $this->orderExtensionFactory->create();
+        }
+
+        $relatedDataItems = $this->orderRelatedDataRepository->getAllByIncrementId($order->getIncrementId());
+        if ($relatedDataItems) {
+            $relatedData = array_map(function(OrderRelatedDataInterface $item){
+                return [$item->getCode() => $item->getValue()];
+            }, $relatedDataItems);
+            $orderExtensionAttributes->setSnowioRelateddata($relatedData);
+        }
+        return $orderExtensionAttributes;
+    }
+
+    /**
+     * @param \Magento\Sales\Api\OrderRepositoryInterface $orderRepository
+     * @param \Magento\Sales\Api\Data\OrderSearchResultInterface $searchResult
+     * @return \Magento\Sales\Api\Data\OrderSearchResultInterface
+     */
+    public function afterGetList(OrderRepositoryInterface $orderRepository, $searchResult)
+    {
+        /** @var \Magento\Sales\Model\Order $order */
+        foreach ($searchResult->getItems() as $order) {
+            $extensionAttributes = $this->getRelatedDataExtensionAttributes($order);
+            $order->setExtensionAttributes($extensionAttributes);
+        }
+        return $searchResult;
     }
 }

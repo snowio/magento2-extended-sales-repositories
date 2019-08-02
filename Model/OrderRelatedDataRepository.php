@@ -43,8 +43,8 @@ class OrderRelatedDataRepository implements OrderRelatedDataRepositoryInterface
     }
 
     /**
-     * @param OrderRelatedDataInterface $orderRelatedData
-     * @return OrderRelatedDataInterface
+     * @param \SnowIO\ExtendedSalesRepositories\Api\Data\OrderRelatedDataInterface $orderRelatedData
+     * @return \SnowIO\ExtendedSalesRepositories\Api\Data\OrderRelatedDataInterface
      * @throws CouldNotSaveException
      */
     public function save(OrderRelatedDataInterface $orderRelatedData)
@@ -109,7 +109,7 @@ class OrderRelatedDataRepository implements OrderRelatedDataRepositoryInterface
      *
      * @param string $orderIncrementId
      * @param string $code
-     * @return OrderRelatedDataInterface
+     * @return \SnowIO\ExtendedSalesRepositories\Api\Data\OrderRelatedDataInterface
      * @throws \Magento\Framework\Exception\LocalizedException
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
@@ -126,9 +126,26 @@ class OrderRelatedDataRepository implements OrderRelatedDataRepositoryInterface
     }
 
     /**
+     * Retrieve All Order Related Data by Order Increment ID
+     *
+     * @param string $orderIncrementId
+     * @return \SnowIO\ExtendedSalesRepositories\Api\Data\OrderRelatedDataInterface
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function getAllByIncrementId($orderIncrementId)
+    {
+        $searchCriteria = $this->searchCriteriaBuilder
+            ->addFilter(OrderRelatedDataInterface::ORDER_INCREMENT_ID, $orderIncrementId, 'eq')
+            ->create();
+
+        return $this->getList($searchCriteria)->getItems();
+    }
+
+    /**
      * Delete by Order Related Data
      *
-     * @param OrderRelatedDataInterface $orderRelatedData
+     * @param \SnowIO\ExtendedSalesRepositories\Api\Data\OrderRelatedDataInterface $orderRelatedData
      * @return bool
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      * @throws \Magento\Framework\Exception\LocalizedException

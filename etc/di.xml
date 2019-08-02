@@ -1,10 +1,6 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <preference
-            for="SnowIO\ExtendedSalesRepositories\Api\Data\AdditionalInformationFieldInterface"
-            type="SnowIO\ExtendedSalesRepositories\Model\AdditionalInformationField" />
-
-    <preference
             for="SnowIO\ExtendedSalesRepositories\Api\ShipOrderByIncrementIdInterface"
             type="SnowIO\ExtendedSalesRepositories\Model\ShipOrderByIncrementId" />
 
@@ -25,7 +21,6 @@
             type="Magento\Framework\Api\SearchResults" />
 
     <type name="Magento\Sales\Api\OrderRepositoryInterface">
-        <plugin name="processAdditionalInformation" type="SnowIO\ExtendedSalesRepositories\Plugin\OrderRepositoryPlugin" disabled="true" />
+        <plugin name="OrderRelatedDataExtensionAttributeOperations" type="SnowIO\ExtendedSalesRepositories\Plugin\OrderRepositoryPlugin" />
     </type>
-
 </config>

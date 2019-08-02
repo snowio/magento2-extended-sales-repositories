@@ -15,14 +15,14 @@ interface OrderRelatedDataRepositoryInterface
     /**
      * Save Order Related Data
      *
-     * @param OrderRelatedDataInterface $orderRelatedData
-     * @return OrderRelatedDataInterface
+     * @param \SnowIO\ExtendedSalesRepositories\Api\Data\OrderRelatedDataInterface $orderRelatedData
+     * @return \SnowIO\ExtendedSalesRepositories\Api\Data\OrderRelatedDataInterface
      */
     public function save(OrderRelatedDataInterface $orderRelatedData);
 
     /**
      * Retrieve list of order related data matching given criteria
-     * @param SearchCriteriaInterface $searchCriteria
+     * @param \Magento\Framework\Api\SearchCriteriaInterface $searchCriteria
      * @return mixed
      */
     public function getList(SearchCriteriaInterface $searchCriteria);
@@ -39,9 +39,15 @@ interface OrderRelatedDataRepositoryInterface
     public function getByOrderIncrementIdAndCode($orderIncrementId, $code);
 
     /**
+     * @param $orderIncrementId
+     * @return \SnowIO\ExtendedSalesRepositories\Api\Data\OrderRelatedDataInterface
+     */
+    public function getAllByIncrementId($orderIncrementId);
+
+    /**
      * Delete Order Related Data
      *
-     * @param OrderRelatedDataInterface $orderRelatedData
+     * @param \SnowIO\ExtendedSalesRepositories\Api\Data\OrderRelatedDataInterface $orderRelatedData
      * @return bool true on success
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      * @throws \Magento\Framework\Exception\LocalizedException

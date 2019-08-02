@@ -3,6 +3,7 @@ namespace SnowIO\ExtendedSalesRepositories\Setup;
 
 use Magento\Framework\DB\Ddl\Table;
 use Magento\Framework\Setup\UpgradeSchemaInterface;
+use SnowIO\ExtendedSalesRepositories\Api\Data\OrderRelatedDataInterface;
 use SnowIO\ExtendedSalesRepositories\Model\ResourceModel;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\SchemaSetupInterface;
@@ -76,11 +77,20 @@ class UpgradeSchema implements UpgradeSchemaInterface
         )->addIndex(
             $setup->getIdxName(
                 $setup->getTable(ResourceModel\OrderRelatedData::TABLE),
-                ['order_entity_id', 'code'],
+                [OrderRelatedDataInterface::ORDER_INCREMENT_ID, OrderRelatedDataInterface::CODE],
                 AdapterInterface::INDEX_TYPE_UNIQUE
             ),
-            ['order_increment_id', 'code'],
+            [OrderRelatedDataInterface::ORDER_INCREMENT_ID, OrderRelatedDataInterface::CODE],
             ['type' => AdapterInterface::INDEX_TYPE_UNIQUE]
+        )
+        ->addIndex(
+            $setup->getIdxName(
+                $setup->getTable(ResourceModel\OrderRelatedData::TABLE),
+                [OrderRelatedDataInterface::ORDER_INCREMENT_ID],
+                AdapterInterface::INDEX_TYPE_INDEX
+            ),
+            [OrderRelatedDataInterface::ORDER_INCREMENT_ID],
+            ['type' => AdapterInterface::INDEX_TYPE_INDEX]
         )
         ->setComment(
             'Persist Key/Value information to reference to an Order'
