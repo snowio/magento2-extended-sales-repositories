@@ -85,7 +85,7 @@ class CreditmemoByOrderIncrementId implements CreditmemoByOrderIncrementIdInterf
      * @param CreditmemoInterface $creditmemo
      * @return array
      */
-    private function filterItemsToBeRefunded(Order $order, CreditmemoInterface $creditmemo)
+    protected function filterItemsToBeRefunded(Order $order, CreditmemoInterface $creditmemo)
     {
         $selectedItemsToRefund = [];
         /** @var \Magento\Sales\Model\Order\Item $orderItem */
@@ -100,7 +100,7 @@ class CreditmemoByOrderIncrementId implements CreditmemoByOrderIncrementIdInterf
         return $selectedItemsToRefund;
     }
 
-    private function loadOrderByIncrementId(string $incrementId)
+    protected function loadOrderByIncrementId(string $incrementId)
     {
         $searchCriteria = (new SearchCriteria())
             ->setFilterGroups([
