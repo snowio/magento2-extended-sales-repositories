@@ -85,7 +85,7 @@ class CreditmemoByOrderIncrementId implements CreditmemoByOrderIncrementIdInterf
      * @param CreditmemoInterface $creditmemo
      * @return array
      */
-    protected function filterItemsToBeRefunded(Order $order, CreditmemoInterface $creditmemo)
+    public function filterItemsToBeRefunded(Order $order, CreditmemoInterface $creditmemo)
     {
         $selectedItemsToRefund = [];
         /** @var \Magento\Sales\Model\Order\Item $orderItem */
