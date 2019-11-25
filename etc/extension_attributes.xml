@@ -6,4 +6,8 @@
     <extension_attributes for="Magento\Sales\Api\Data\OrderInterface">
         <attribute code="snowio_relateddata" type="SnowIO\ExtendedSalesRepositories\Api\Data\OrderRelatedDataInterface[]" />
     </extension_attributes>
+
+    <extension_attributes for="Magento\Sales\Api\Data\CreditmemoItemInterface">
+        <attribute code="back_to_stock" type="boolean" />
+    </extension_attributes>
 </config>

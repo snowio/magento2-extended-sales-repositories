@@ -72,6 +72,8 @@ class CreditmemoByOrderIncrementId implements CreditmemoByOrderIncrementIdInterf
         ]);
         $newCreditmemo->setState(Creditmemo::STATE_OPEN);
 
+        $this->addBackToStockStatus($order, $creditmemo, $newCreditmemo);
+
         $this->creditmemoRepository->save($newCreditmemo);
 
         return $this->creditmemoManagement->refund($newCreditmemo);
@@ -98,6 +100,35 @@ class CreditmemoByOrderIncrementId implements CreditmemoByOrderIncrementIdInterf
             }
         }
         return $selectedItemsToRefund;
+    }
+
+    /**
+     * @param Order $order
+     * @param CreditmemoInterface $creditmemo
+     * @param CreditmemoInterface $newCreditmemo
+     */
+    protected function addBackToStockStatus(Order $order, CreditmemoInterface $creditmemo, CreditmemoInterface $newCreditmemo)
+    {
+        $itemsToBackToStock = [];
+        /** @var \Magento\Sales\Model\Order\Item $orderItem */
+        foreach ($order->getAllItems() as $orderItem){
+            /** @var \Magento\Sales\Model\Order\Creditmemo\Item $inputItem */
+            foreach ($creditmemo->getItems() as $inputItem){
+                if (
+                    $orderItem->getSku() === $inputItem->getSku() &&
+                    $inputItem->getExtensionAttributes()->getBackToStock() &&
+                    (!in_array($inputItem->getSku(), $itemsToBackToStock))
+                ){
+                    array_push($itemsToBackToStock, $inputItem->getSku());
+                }
+            }
+        }
+
+        foreach($newCreditmemo->getItems() as $memoItem) {
+            if (in_array($memoItem->getSku(), $itemsToBackToStock)) {
+                $memoItem->setBackToStock(true);
+            }
+        }
     }
 
     protected function loadOrderByIncrementId(string $incrementId)
