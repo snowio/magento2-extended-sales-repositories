@@ -12,6 +12,9 @@ use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Creditmemo;
 use Magento\Sales\Model\Order\CreditmemoFactory;
 use SnowIO\ExtendedSalesRepositories\Api\CreditmemoByOrderIncrementIdInterface;
+use Magento\Sales\Api\Data\OrderInterface;
+use Magento\Sales\Api\Data\CreditmemoItemInterface;
+use Magento\Sales\Api\Data\OrderItemInterface;
 
 class CreditmemoByOrderIncrementId implements CreditmemoByOrderIncrementIdInterface
 {
@@ -103,61 +106,45 @@ class CreditmemoByOrderIncrementId implements CreditmemoByOrderIncrementIdInterf
     }
 
     /**
-     * @param Order $order
+     * @param OrderInterface $order
      * @param CreditmemoInterface $creditmemo
      * @param CreditmemoInterface $newCreditmemo
      */
-    protected function addBackToStockStatus(Order $order, CreditmemoInterface $creditmemo, CreditmemoInterface $newCreditmemo)
+    protected function addBackToStockStatus(OrderInterface $order, CreditmemoInterface $creditmemo, CreditmemoInterface $newCreditmemo)
     {
         $itemsToBackToStock = [];
         /** @var \Magento\Sales\Model\Order\Item $orderItem */
         foreach ($order->getAllItems() as $orderItem){
-            /** @var \Magento\Sales\Model\Order\Creditmemo\Item $inputItem */
-            foreach ($creditmemo->getItems() as $inputItem){
-                $itemsToBackToStock = $this->getBackToStockItems(
-                    $itemsToBackToStock,
-                    $orderItem->getSku(),
-                    $inputItem->getSku(),
-                    $inputItem->getExtensionAttributes()->getBackToStock()
-                );
+            /** @var \Magento\Sales\Model\Order\Creditmemo\Item $creditmemoItem */
+            foreach ($creditmemo->getItems() as $creditmemoItem){
+                if (!$this->shouldGoBackToStock($creditmemoItem, $orderItem)) {
+                    continue;
+                }
+
+                $itemsToBackToStock[] = $creditmemoItem->getSku();
             }
         }
 
-        $this->addBackToStockStatusToCreditmemo($newCreditmemo, $itemsToBackToStock);
-    }
-
-    /**
-     * @param array $itemsToBackToStock
-     * @param string $orderItemSku
-     * @param string $inputItemSku
-     * @param bool|null $inputItemBackToStockStatus
-     * @return array
-     */
-    private function getBackToStockItems(array $itemsToBackToStock, string $orderItemSku, string $inputItemSku, $inputItemBackToStockStatus): array
-    {
-        if (
-            $orderItemSku === $inputItemSku &&
-            $inputItemBackToStockStatus &&
-            (!in_array($inputItemSku, $itemsToBackToStock))
-        ) {
-            $itemsToBackToStock[] = $inputItemSku;
-        }
-
-        return $itemsToBackToStock;
-    }
-
-    /**
-     * @param CreditmemoInterface $newCreditmemo
-     * @param array $itemsToBackToStock
-     */
-    private function addBackToStockStatusToCreditmemo(CreditmemoInterface $newCreditmemo, array $itemsToBackToStock)
-    {
+        $itemsToBackToStock = array_unique($itemsToBackToStock);
         foreach($newCreditmemo->getItems() as $memoItem) {
             if (in_array($memoItem->getSku(), $itemsToBackToStock)) {
                 $memoItem->setBackToStock(true);
             }
         }
     }
+
+    /**
+     * @param CreditmemoItemInterface $creditmemoItem
+     * @param OrderItemInterface $orderItem
+     * @return bool
+     */
+    protected function shouldGoBackToStock(CreditmemoItemInterface $creditmemoItem, OrderItemInterface $orderItem): bool
+    {
+        $backToStockStatus = $creditmemoItem->getExtensionAttributes() ? $creditmemoItem->getExtensionAttributes()->getBackToStock() : 0;
+        return $orderItem->getSku() === $creditmemoItem->getSku()
+            && $backToStockStatus;
+    }
+
 
     protected function loadOrderByIncrementId(string $incrementId)
     {
