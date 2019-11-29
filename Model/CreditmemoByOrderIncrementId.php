@@ -114,16 +114,44 @@ class CreditmemoByOrderIncrementId implements CreditmemoByOrderIncrementIdInterf
         foreach ($order->getAllItems() as $orderItem){
             /** @var \Magento\Sales\Model\Order\Creditmemo\Item $inputItem */
             foreach ($creditmemo->getItems() as $inputItem){
-                if (
-                    $orderItem->getSku() === $inputItem->getSku() &&
-                    $inputItem->getExtensionAttributes()->getBackToStock() &&
-                    (!in_array($inputItem->getSku(), $itemsToBackToStock))
-                ){
-                    array_push($itemsToBackToStock, $inputItem->getSku());
-                }
+                $itemsToBackToStock = $this->getBackToStockItems(
+                    $itemsToBackToStock,
+                    $orderItem->getSku(),
+                    $inputItem->getSku(),
+                    $inputItem->getExtensionAttributes()->getBackToStock()
+                );
             }
         }
 
+        $this->addBackToStockStatusToCreditmemo($newCreditmemo, $itemsToBackToStock);
+    }
+
+    /**
+     * @param array $itemsToBackToStock
+     * @param string $orderItemSku
+     * @param string $inputItemSku
+     * @param bool|null $inputItemBackToStockStatus
+     * @return array
+     */
+    private function getBackToStockItems(array $itemsToBackToStock, string $orderItemSku, string $inputItemSku, $inputItemBackToStockStatus): array
+    {
+        if (
+            $orderItemSku === $inputItemSku &&
+            $inputItemBackToStockStatus &&
+            (!in_array($inputItemSku, $itemsToBackToStock))
+        ) {
+            $itemsToBackToStock[] = $inputItemSku;
+        }
+
+        return $itemsToBackToStock;
+    }
+
+    /**
+     * @param CreditmemoInterface $newCreditmemo
+     * @param array $itemsToBackToStock
+     */
+    private function addBackToStockStatusToCreditmemo(CreditmemoInterface $newCreditmemo, array $itemsToBackToStock)
+    {
         foreach($newCreditmemo->getItems() as $memoItem) {
             if (in_array($memoItem->getSku(), $itemsToBackToStock)) {
                 $memoItem->setBackToStock(true);
