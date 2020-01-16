@@ -34,7 +34,7 @@ class OrderRepositoryPlugin
         return $orders;
     }
 
-    private function changeAdditionalInformation(OrderInterface &$order): OrderInterface
+    private function changeAdditionalInformation(OrderInterface $order): OrderInterface
     {
         $payment = $order->getPayment();
         $additionalInformation = $payment->getAdditionalInformation();
