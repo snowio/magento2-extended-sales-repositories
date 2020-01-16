@@ -20,19 +20,17 @@ class OrderRepositoryPlugin
      * Unset additional information to avoid web services being broken by nested array
      * and add the additional information as a json encoded string to an extension attribute.
      */
-    public function afterGet(OrderRepositoryInterface $orderRepository, OrderInterface $order)
+    public function afterGet(OrderRepositoryInterface $subject, OrderInterface $order)
     {
         $this->changeAdditionalInformation($order);
         return $order;
     }
 
-    public function afterGetList(OrderRepositoryInterface $orderRepository, OrderSearchResultInterface $orders)
+    public function afterGetList(OrderRepositoryInterface $subject, OrderSearchResultInterface $orders)
     {
-        foreach ($orders->getItems() as $key => $order)
-        {
+        foreach ($orders->getItems() as $order) {
             $this->changeAdditionalInformation($order);
         }
-
         return $orders;
     }
 
