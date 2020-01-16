@@ -2,6 +2,7 @@
 namespace SnowIO\ExtendedSalesRepositories\Plugin;
 
 use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Sales\Api\Data\OrderSearchResultInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\OrderPaymentExtensionFactory;
 
@@ -21,10 +22,25 @@ class OrderRepositoryPlugin
      */
     public function afterGet(OrderRepositoryInterface $orderRepository, OrderInterface $order)
     {
+        $this->changeAdditionalInformation($order);
+        return $order;
+    }
+
+    public function afterGetList(OrderRepositoryInterface $orderRepository, OrderSearchResultInterface $orders)
+    {
+        foreach ($orders->getItems() as $key => $order)
+        {
+            $this->changeAdditionalInformation($order);
+        }
+
+        return $orders;
+    }
+
+    private function changeAdditionalInformation(OrderInterface &$order): OrderInterface
+    {
         $payment = $order->getPayment();
         $additionalInformation = $payment->getAdditionalInformation();
         $additionalInformationJson = json_encode($additionalInformation);
-
         $extensionAttributes = $payment->getExtensionAttributes();
         if (null === $extensionAttributes) {
             $extensionAttributes = $this->orderPaymentExtensionFactory->create();
@@ -35,8 +51,5 @@ class OrderRepositoryPlugin
         if (method_exists($payment, 'unsAdditionalInformation')) {
             $payment->unsAdditionalInformation();
         }
-
-        return $order;
-
     }
 }
