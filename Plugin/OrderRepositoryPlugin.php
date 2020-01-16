@@ -22,21 +22,18 @@ class OrderRepositoryPlugin
      */
     public function afterGet(OrderRepositoryInterface $subject, OrderInterface $order)
     {
-        $order = $this->changeAdditionalInformation($order);
-        return $order;
+        return $this->applyAttributesToOrderItem($order);
     }
 
     public function afterGetList(OrderRepositoryInterface $subject, OrderSearchResultInterface $orders)
     {
-        $updatedOrders = [];
         foreach ($orders->getItems() as $order) {
-            $updatedOrders[] = $this->changeAdditionalInformation($order);
+            $this->applyAttributesToOrderItem($order);
         }
-        $orders->setItems($updatedOrders);
         return $orders;
     }
 
-    private function changeAdditionalInformation(OrderInterface $order): OrderInterface
+    private function applyAttributesToOrderItem(OrderInterface $order): OrderInterface
     {
         $payment = $order->getPayment();
         $additionalInformation = $payment->getAdditionalInformation();
