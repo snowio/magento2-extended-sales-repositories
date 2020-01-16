@@ -22,15 +22,17 @@ class OrderRepositoryPlugin
      */
     public function afterGet(OrderRepositoryInterface $subject, OrderInterface $order)
     {
-        $this->changeAdditionalInformation($order);
+        $order = $this->changeAdditionalInformation($order);
         return $order;
     }
 
     public function afterGetList(OrderRepositoryInterface $subject, OrderSearchResultInterface $orders)
     {
+        $updatedOrders = [];
         foreach ($orders->getItems() as $order) {
-            $this->changeAdditionalInformation($order);
+            $updatedOrders[] = $this->changeAdditionalInformation($order);
         }
+        $orders->setItems($updatedOrders);
         return $orders;
     }
 
@@ -49,5 +51,7 @@ class OrderRepositoryPlugin
         if (method_exists($payment, 'unsAdditionalInformation')) {
             $payment->unsAdditionalInformation();
         }
+
+        return $order;
     }
 }
