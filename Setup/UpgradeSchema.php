@@ -22,6 +22,10 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->installOrderRelatedDataSchema($setup);
         }
 
+        if (version_compare($context->getVersion(), '1.1.1', '<')) {
+            $this->updateIdColumnToInt10($setup);
+        }
+
         $setup->endSetup();
     }
 
@@ -97,5 +101,32 @@ class UpgradeSchema implements UpgradeSchemaInterface
         );
 
         $setup->getConnection()->createTable($table);
+    }
+
+    /**
+     * The original `smallint(6)` field had a maximum auto increment value of 32767 which is easily depleted. This
+     * updates the column to `int(10) unsigned` which has a maximum of 4294967295
+     *
+     * @param \Magento\Framework\Setup\SchemaSetupInterface $setup
+     */
+    private function updateIdColumnToInt10(SchemaSetupInterface $setup)
+    {
+        $connection = $setup->getConnection();
+        if (!$connection->tableColumnExists($setup->getTable(ResourceModel\OrderRelatedData::TABLE), 'id')) {
+            return;
+        }
+
+        $connection->modifyColumn(
+            $setup->getTable(ResourceModel\OrderRelatedData::TABLE),
+            'id',
+            [
+                'type' => Table::TYPE_INTEGER,
+                'identity' => true,
+                'nullable' => false,
+                'primary' => true,
+                'unsigned' => true,
+                'comment' => 'ID'
+            ]
+        );
     }
 }
