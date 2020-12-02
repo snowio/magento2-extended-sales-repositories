@@ -1,0 +1,19 @@
+{
+    "snowio_order_relateddata": {
+        "column": {
+            "id": true,
+            "order_increment_id": true,
+            "code": true,
+            "value": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "index": {
+            "SNOWIO_ORDER_RELATEDDATA_ORDER_INCREMENT_ID": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "SNOWIO_ORDER_RELATEDDATA_ORDER_INCREMENT_ID_CODE": true
+        }
+    }
+}

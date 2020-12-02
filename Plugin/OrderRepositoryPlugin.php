@@ -10,17 +10,23 @@ use SnowIO\ExtendedSalesRepositories\Api\OrderRelatedDataRepositoryInterface;
 
 class OrderRepositoryPlugin
 {
-    /** @var OrderRelatedDataRepositoryInterface */
-    private $orderRelatedDataRepository;
+    public ExtensionAttributesFactory $extensionAttributesFactory;
+    private OrderRelatedDataRepositoryInterface $orderRelatedDataRepository;
+    private OrderExtensionFactory $orderExtensionFactory;
 
-    /** @var OrderExtensionFactory */
-    private $orderExtensionFactory;
-
+    /**
+     * OrderRepositoryPlugin constructor.
+     * @param OrderExtensionFactory $orderExtensionFactory
+     * @param OrderRelatedDataRepositoryInterface $orderRelatedDataRepository
+     * @param ExtensionAttributesFactory $extensionAttributesFactory
+     */
     public function __construct(
+        OrderExtensionFactory $orderExtensionFactory,
         OrderRelatedDataRepositoryInterface $orderRelatedDataRepository,
         ExtensionAttributesFactory $extensionAttributesFactory
     )
     {
+        $this->orderExtensionFactory = $orderExtensionFactory;
         $this->orderRelatedDataRepository = $orderRelatedDataRepository;
         $this->extensionAttributesFactory = $extensionAttributesFactory;
     }
@@ -54,9 +60,7 @@ class OrderRepositoryPlugin
 
         $relatedDataItems = $this->orderRelatedDataRepository->getAllByIncrementId($order->getIncrementId());
         if ($relatedDataItems) {
-            $relatedData = array_map(function(OrderRelatedDataInterface $item){
-                return [$item->getCode() => $item->getValue()];
-            }, $relatedDataItems);
+            $relatedData = array_map(fn(OrderRelatedDataInterface $item) => [$item->getCode() => $item->getValue()], $relatedDataItems);
             $orderExtensionAttributes->setSnowioRelateddata($relatedData);
         }
         return $orderExtensionAttributes;

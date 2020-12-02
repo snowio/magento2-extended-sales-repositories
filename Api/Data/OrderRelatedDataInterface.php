@@ -9,10 +9,10 @@ namespace SnowIO\ExtendedSalesRepositories\Api\Data;
 
 interface OrderRelatedDataInterface
 {
-    const ID = 'id';
-    const ORDER_INCREMENT_ID = 'order_increment_id';
-    const CODE = 'code';
-    const VALUE = 'value';
+    public const ID = 'id';
+    public const ORDER_INCREMENT_ID = 'order_increment_id';
+    public const CODE = 'code';
+    public const VALUE = 'value';
 
     /**
      * @return string
