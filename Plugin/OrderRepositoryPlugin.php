@@ -10,17 +10,23 @@ use SnowIO\ExtendedSalesRepositories\Api\OrderRelatedDataRepositoryInterface;
 
 class OrderRepositoryPlugin
 {
-    public \Magento\Framework\Api\ExtensionAttributesFactory $extensionAttributesFactory;
-    private \SnowIO\ExtendedSalesRepositories\Api\OrderRelatedDataRepositoryInterface $orderRelatedDataRepository;
+    public ExtensionAttributesFactory $extensionAttributesFactory;
+    private OrderRelatedDataRepositoryInterface $orderRelatedDataRepository;
+    private OrderExtensionFactory $orderExtensionFactory;
 
-    /** @var OrderExtensionFactory */
-    private $orderExtensionFactory;
-
+    /**
+     * OrderRepositoryPlugin constructor.
+     * @param OrderExtensionFactory $orderExtensionFactory
+     * @param OrderRelatedDataRepositoryInterface $orderRelatedDataRepository
+     * @param ExtensionAttributesFactory $extensionAttributesFactory
+     */
     public function __construct(
+        OrderExtensionFactory $orderExtensionFactory,
         OrderRelatedDataRepositoryInterface $orderRelatedDataRepository,
         ExtensionAttributesFactory $extensionAttributesFactory
     )
     {
+        $this->orderExtensionFactory = $orderExtensionFactory;
         $this->orderRelatedDataRepository = $orderRelatedDataRepository;
         $this->extensionAttributesFactory = $extensionAttributesFactory;
     }
