@@ -18,17 +18,13 @@ use Magento\Sales\Api\Data\OrderItemInterface;
 
 class CreditmemoByOrderIncrementId implements CreditmemoByOrderIncrementIdInterface
 {
-    /** @var CreditmemoManagementInterface */
-    private $creditmemoManagement;
+    private \Magento\Sales\Api\CreditmemoManagementInterface $creditmemoManagement;
 
-    /** @var CreditmemoRepositoryInterface */
-    private $creditmemoRepository;
+    private \Magento\Sales\Api\CreditmemoRepositoryInterface $creditmemoRepository;
 
-    /** @var OrderRepositoryInterface */
-    private $orderRepository;
+    private \Magento\Sales\Api\OrderRepositoryInterface $orderRepository;
 
-    /** @var CreditmemoFactory */
-    private $creditmemoFactory;
+    private \Magento\Sales\Model\Order\CreditmemoFactory $creditmemoFactory;
 
     /**
      * CreditmemoByOrderIncrementId constructor.

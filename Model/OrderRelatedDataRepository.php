@@ -17,17 +17,13 @@ use SnowIO\ExtendedSalesRepositories\Model\ResourceModel\OrderRelatedData\Collec
 
 class OrderRelatedDataRepository implements OrderRelatedDataRepositoryInterface
 {
-    /** @var ResourceModel\OrderRelatedData */
-    protected $resource;
+    protected \SnowIO\ExtendedSalesRepositories\Model\ResourceModel\OrderRelatedData $resource;
 
-    /** @var OrderRelatedDataFactory */
-    protected $factory;
+    protected \SnowIO\ExtendedSalesRepositories\Model\OrderRelatedDataFactory $factory;
 
-    /** @var SearchCriteriaBuilder */
-    private $searchCriteriaBuilder;
+    private \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder;
 
-    /** @var OrderRelatedDataSearchResultsInterfaceFactory */
-    private $searchResultsFactory;
+    private \SnowIO\ExtendedSalesRepositories\Api\Data\OrderRelatedDataSearchResultsInterfaceFactory $searchResultsFactory;
 
     public function __construct(
         OrderRelatedDataFactory $factory,
@@ -66,7 +62,7 @@ class OrderRelatedDataRepository implements OrderRelatedDataRepositoryInterface
             return $orderRelatedData;
 
         } catch (\Exception $exception) {
-            throw new CouldNotSaveException(__($exception->getMessage()));
+            throw new CouldNotSaveException(__($exception->getMessage()), $exception);
         }
     }
 
@@ -155,7 +151,7 @@ class OrderRelatedDataRepository implements OrderRelatedDataRepositoryInterface
         try {
             $this->resource->delete($orderRelatedData);
         } catch (\Exception $exception) {
-            throw new CouldNotDeleteException(__($exception->getMessage()));
+            throw new CouldNotDeleteException(__($exception->getMessage()), $exception);
         }
         return true;
     }

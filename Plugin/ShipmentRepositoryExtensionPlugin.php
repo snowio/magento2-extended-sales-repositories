@@ -9,7 +9,7 @@ use Magento\Sales\Api\ShipmentRepositoryInterface;
 
 class ShipmentRepositoryExtensionPlugin
 {
-    private $orderRepository;
+    private \Magento\Sales\Api\OrderRepositoryInterface $orderRepository;
 
     public function __construct(OrderRepositoryInterface $orderRepository)
     {

@@ -11,8 +11,8 @@ use SnowIO\ExtendedSalesRepositories\Api\ShipOrderByIncrementIdInterface;
 class ShipOrderByIncrementId implements ShipOrderByIncrementIdInterface
 {
 
-    private $shipOrder;
-    private $orderRepository;
+    private \Magento\Sales\Api\ShipOrderInterface $shipOrder;
+    private \Magento\Sales\Api\OrderRepositoryInterface $orderRepository;
 
     public function __construct(OrderRepositoryInterface $orderRepository, ShipOrderInterface $shipOrder)
     {

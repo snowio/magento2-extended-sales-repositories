@@ -10,8 +10,8 @@ use SnowIO\ExtendedSalesRepositories\Api\OrderRelatedDataRepositoryInterface;
 
 class OrderRepositoryPlugin
 {
-    /** @var OrderRelatedDataRepositoryInterface */
-    private $orderRelatedDataRepository;
+    public \Magento\Framework\Api\ExtensionAttributesFactory $extensionAttributesFactory;
+    private \SnowIO\ExtendedSalesRepositories\Api\OrderRelatedDataRepositoryInterface $orderRelatedDataRepository;
 
     /** @var OrderExtensionFactory */
     private $orderExtensionFactory;
@@ -54,9 +54,7 @@ class OrderRepositoryPlugin
 
         $relatedDataItems = $this->orderRelatedDataRepository->getAllByIncrementId($order->getIncrementId());
         if ($relatedDataItems) {
-            $relatedData = array_map(function(OrderRelatedDataInterface $item){
-                return [$item->getCode() => $item->getValue()];
-            }, $relatedDataItems);
+            $relatedData = array_map(fn(OrderRelatedDataInterface $item) => [$item->getCode() => $item->getValue()], $relatedDataItems);
             $orderExtensionAttributes->setSnowioRelateddata($relatedData);
         }
         return $orderExtensionAttributes;

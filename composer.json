@@ -10,14 +10,17 @@
         }
     ],
     "require": {
-        "php": ">=5.6",
-        "magento/module-sales": "^100.1.2|^101.0.2|^102.0.1",
-        "magento/framework": "^100.1.2|^101.0.2|^102.0.1"
+        "php": "^7.4",
+        "magento/module-sales": "^103",
+        "magento/framework": "^103"
     },
     "autoload": {
         "files": [ "registration.php" ],
         "psr-4": {
             "SnowIO\\ExtendedSalesRepositories\\": ""
         }
+    },
+    "require-dev": {
+        "rector/rector": "^0.8.56"
     }
 }
