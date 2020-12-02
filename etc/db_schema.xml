@@ -1,22 +1,22 @@
 <?xml version="1.0"?>
 <schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
   <table name="snowio_order_relateddata" resource="default" engine="innodb" comment="Persist Key/Value information to reference to an Order">
-    <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true" comment="ID"/>
-    <column xsi:type="varchar" name="order_increment_id" nullable="false" length="50" comment="Order Increment Id"/>
-    <column xsi:type="varchar" name="code" nullable="false" length="255" comment="Key for the Data"/>
-    <column xsi:type="varchar" name="value" nullable="true" length="255" comment="Value for the Data"/>
-    <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Created At"/>
-    <column xsi:type="timestamp" name="updated_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Created At"/>
-    <constraint xsi:type="primary" referenceId="PRIMARY">
-      <column name="id"/>
-      <column name="id"/>
-    </constraint>
-    <constraint xsi:type="unique" referenceId="SNOWIO_ORDER_RELATEDDATA_ORDER_INCREMENT_ID_CODE">
-      <column name="order_increment_id"/>
-      <column name="code"/>
-    </constraint>
-    <index referenceId="SNOWIO_ORDER_RELATEDDATA_ORDER_INCREMENT_ID" indexType="btree">
-      <column name="order_increment_id"/>
-    </index>
+      <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true" comment="ID"/>
+      <column xsi:type="varchar" name="order_increment_id" nullable="false" length="50" comment="Order Increment Id"/>
+      <column xsi:type="varchar" name="code" nullable="false" length="255" comment="Key for the Data"/>
+      <column xsi:type="varchar" name="value" nullable="true" length="255" comment="Value for the Data"/>
+      <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Created At"/>
+      <column xsi:type="timestamp" name="updated_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Created At"/>
+      <constraint xsi:type="primary" referenceId="PRIMARY">
+        <column name="id"/>
+        <column name="id"/>
+      </constraint>
+      <constraint xsi:type="unique" referenceId="SNOWIO_ORDER_RELATEDDATA_ORDER_INCREMENT_ID_CODE">
+        <column name="order_increment_id"/>
+        <column name="code"/>
+      </constraint>
+      <index referenceId="SNOWIO_ORDER_RELATEDDATA_ORDER_INCREMENT_ID" indexType="btree">
+        <column name="order_increment_id"/>
+      </index>
   </table>
 </schema>
