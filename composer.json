@@ -9,6 +9,10 @@
             "email": "amw@amp.co"
         }
     ],
+    "repositories": [
+        {"type": "composer", "url": "https://repo.packagist.com/ampersandhq/"},
+        {"packagist.org": false}
+    ],
     "require": {
         "php": "^7.4",
         "magento/module-sales": "^103",
