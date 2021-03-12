@@ -4,15 +4,15 @@ namespace SnowIO\ExtendedSalesRepositories\Model;
 use Magento\Framework\Api\Filter;
 use Magento\Framework\Api\Search\FilterGroup;
 use Magento\Framework\Api\SearchCriteria;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Sales\Api\Data\CreditmemoInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Api\CreditmemoManagementInterface;
 use Magento\Sales\Api\CreditmemoRepositoryInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Creditmemo;
-use Magento\Sales\Model\Order\CreditmemoFactory;
+use Magento\Sales\Model\Order\Creditmemo\Item;
 use Magento\Sales\Model\Order\Email\Sender\CreditmemoSender;
-use Magento\Sales\Model\Order\Invoice;
 use Psr\Log\LoggerInterface;
 use SnowIO\ExtendedSalesRepositories\Api\CreditmemoByOrderIncrementIdInterface;
 use Magento\Sales\Api\Data\OrderInterface;
@@ -23,9 +23,9 @@ use SnowIO\ExtendedSalesRepositories\Exception\SnowCreditMemoException;
 class CreditmemoByOrderIncrementId implements CreditmemoByOrderIncrementIdInterface
 {
     /**
-     * @var RefundableItemsFilter
+     * @var ExtendedCreditMemoFactory
      */
-    private $refundableItemsFilter;
+    private $extendedCreditMemoFactory;
 
     /**
      * @var ApplyAdjustments
@@ -53,43 +53,35 @@ class CreditmemoByOrderIncrementId implements CreditmemoByOrderIncrementIdInterf
     private $orderRepository;
 
     /**
-     * @var CreditmemoFactory
-     */
-    private $creditmemoFactory;
-
-    /**
      * @var LoggerInterface
      */
     private $logger;
 
     /**
      * CreditmemoByOrderIncrementId constructor.
-     * @param RefundableItemsFilter $refundableItemsFilter
+     * @param ExtendedCreditMemoFactory $extendedCreditMemoFactory
      * @param ApplyAdjustments $applyAdjustments
      * @param CreditmemoSender $creditmemoSender
      * @param CreditmemoRepositoryInterface $creditmemoRepository
      * @param CreditmemoManagementInterface $creditmemoManagement
      * @param OrderRepositoryInterface $orderRepository
-     * @param CreditmemoFactory $creditmemoFactory
      * @param LoggerInterface $logger
      */
     public function __construct(
-        RefundableItemsFilter $refundableItemsFilter,
+        ExtendedCreditMemoFactory $extendedCreditMemoFactory,
         ApplyAdjustments $applyAdjustments,
         CreditmemoSender $creditmemoSender,
         CreditmemoRepositoryInterface $creditmemoRepository,
         CreditmemoManagementInterface $creditmemoManagement,
         OrderRepositoryInterface $orderRepository,
-        CreditmemoFactory $creditmemoFactory,
         LoggerInterface $logger
     ) {
-        $this->refundableItemsFilter = $refundableItemsFilter;
+        $this->extendedCreditMemoFactory = $extendedCreditMemoFactory;
         $this->applyAdjustments = $applyAdjustments;
         $this->creditmemoSender = $creditmemoSender;
         $this->creditmemoRepository = $creditmemoRepository;
         $this->creditmemoManagement = $creditmemoManagement;
         $this->orderRepository = $orderRepository;
-        $this->creditmemoFactory = $creditmemoFactory;
         $this->logger = $logger;
     }
 
@@ -99,13 +91,12 @@ class CreditmemoByOrderIncrementId implements CreditmemoByOrderIncrementIdInterf
      * @param string $orderIncrementId
      * @param CreditmemoInterface $creditmemo
      * @return CreditmemoInterface
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     public function createAndRefund(
         $orderIncrementId,
         CreditmemoInterface $creditmemo
     ) {
-        /** @var Order $order */
         $order = $this->loadOrderByIncrementId($orderIncrementId);
 
         if(!$order->canCreditmemo()) {
@@ -114,10 +105,14 @@ class CreditmemoByOrderIncrementId implements CreditmemoByOrderIncrementIdInterf
             );
         }
 
-        $newCreditmemo = $this->createCreditMemo($order, $creditmemo);
+        $newCreditmemo = $this->extendedCreditMemoFactory->create($order, $creditmemo);
 
         $this->addBackToStockStatus($order, $creditmemo, $newCreditmemo);
+
+        ExtendedCreditMemoManagement::resetAmounts($newCreditmemo);
+        ExtendedCreditMemoManagement::resetTax($newCreditmemo);
         $this->applyAdjustments->execute($newCreditmemo, $creditmemo);
+
         $newCreditmemo->collectTotals();
         $newCreditmemo->setState(Creditmemo::STATE_OPEN);
         $this->creditmemoRepository->save($newCreditmemo);
@@ -130,28 +125,13 @@ class CreditmemoByOrderIncrementId implements CreditmemoByOrderIncrementIdInterf
          * @see \Magento\Sales\Controller\Adminhtml\Order\Creditmemo\Save
          */
         try {
-            /** @var \Magento\Sales\Model\Order\Creditmemo $newCreditmemo */
+            /** @var Creditmemo $newCreditmemo */
             $this->creditmemoSender->send($newCreditmemo);
         } catch (\Exception $exception) {
             $this->logger->error($exception);
         }
 
         return $newCreditmemo;
-    }
-
-    private function createCreditMemo(Order $order, CreditmemoInterface $creditmemo): Creditmemo
-    {
-        $refundableItems = $this->refundableItemsFilter->filter($order, $creditmemo);
-
-        if ($orderInvoice = $this->getLatestPaidInvoiceForOrder($order)) {
-            return $this->creditmemoFactory->createByInvoice($orderInvoice, [
-                'qtys' => $refundableItems
-            ]);
-        } else {
-            return $this->creditmemoFactory->createByOrder($order, [
-                'qtys' => $refundableItems
-            ]);
-        }
     }
 
     /**
@@ -163,11 +143,10 @@ class CreditmemoByOrderIncrementId implements CreditmemoByOrderIncrementIdInterf
         OrderInterface $order,
         CreditmemoInterface $creditmemo,
         CreditmemoInterface $newCreditmemo
-    ): void {
+    ) {
         $itemsToBackToStock = [];
-        /** @var \Magento\Sales\Model\Order\Item $orderItem */
         foreach ($order->getAllItems() as $orderItem){
-            /** @var \Magento\Sales\Model\Order\Creditmemo\Item $creditmemoItem */
+            /** @var Item $creditmemoItem */
             foreach ($creditmemo->getItems() as $creditmemoItem){
                 if (!$this->shouldGoBackToStock($creditmemoItem, $orderItem)) {
                     continue;
@@ -179,7 +158,7 @@ class CreditmemoByOrderIncrementId implements CreditmemoByOrderIncrementIdInterf
 
         $itemsToBackToStock = array_unique($itemsToBackToStock);
         foreach($newCreditmemo->getItems() as $memoItem) {
-            if (in_array($memoItem->getSku(), $itemsToBackToStock)) {
+            if (in_array($memoItem->getSku(), $itemsToBackToStock, true)) {
                 $memoItem->setBackToStock(true);
             }
         }
@@ -190,7 +169,7 @@ class CreditmemoByOrderIncrementId implements CreditmemoByOrderIncrementIdInterf
      * @param OrderItemInterface $orderItem
      * @return bool
      */
-    protected function shouldGoBackToStock(CreditmemoItemInterface $creditmemoItem, OrderItemInterface $orderItem): bool
+    protected function shouldGoBackToStock(CreditmemoItemInterface $creditmemoItem, OrderItemInterface $orderItem)
     {
         $backToStockStatus = $creditmemoItem->getExtensionAttributes() ?
             $creditmemoItem->getExtensionAttributes()->getBackToStock() : 0;
@@ -198,25 +177,7 @@ class CreditmemoByOrderIncrementId implements CreditmemoByOrderIncrementIdInterf
             && $backToStockStatus;
     }
 
-    /**
-     * Get latest invoice for order
-     *
-     * @param \Magento\Sales\Model\Order $order
-     * @return \Magento\Sales\Model\Order\Invoice|null
-     */
-    private function getLatestPaidInvoiceForOrder(Order $order) : ?Invoice
-    {
-        /** @var \Magento\Sales\Model\Order\Invoice $latestInvoice */
-        $latestInvoice = $order->getInvoiceCollection()
-            ->addAttributeToFilter('state', ['eq' => Invoice::STATE_PAID])
-            ->setPageSize(1)
-            ->setCurPage(1)
-            ->getLastItem();
-
-        return $latestInvoice->getId() ? $latestInvoice : null;
-    }
-
-    protected function loadOrderByIncrementId(string $incrementId): Order
+    protected function loadOrderByIncrementId(string $incrementId)
     {
         $searchCriteria = (new SearchCriteria())
             ->setFilterGroups([
