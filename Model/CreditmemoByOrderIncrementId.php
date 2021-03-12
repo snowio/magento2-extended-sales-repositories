@@ -28,11 +28,6 @@ class CreditmemoByOrderIncrementId implements CreditmemoByOrderIncrementIdInterf
     private $extendedCreditMemoFactory;
 
     /**
-     * @var ApplyAdjustments
-     */
-    private $applyAdjustments;
-
-    /**
      * @var CreditmemoSender
      */
     private $creditmemoSender;
@@ -60,7 +55,6 @@ class CreditmemoByOrderIncrementId implements CreditmemoByOrderIncrementIdInterf
     /**
      * CreditmemoByOrderIncrementId constructor.
      * @param ExtendedCreditMemoFactory $extendedCreditMemoFactory
-     * @param ApplyAdjustments $applyAdjustments
      * @param CreditmemoSender $creditmemoSender
      * @param CreditmemoRepositoryInterface $creditmemoRepository
      * @param CreditmemoManagementInterface $creditmemoManagement
@@ -69,7 +63,6 @@ class CreditmemoByOrderIncrementId implements CreditmemoByOrderIncrementIdInterf
      */
     public function __construct(
         ExtendedCreditMemoFactory $extendedCreditMemoFactory,
-        ApplyAdjustments $applyAdjustments,
         CreditmemoSender $creditmemoSender,
         CreditmemoRepositoryInterface $creditmemoRepository,
         CreditmemoManagementInterface $creditmemoManagement,
@@ -77,7 +70,6 @@ class CreditmemoByOrderIncrementId implements CreditmemoByOrderIncrementIdInterf
         LoggerInterface $logger
     ) {
         $this->extendedCreditMemoFactory = $extendedCreditMemoFactory;
-        $this->applyAdjustments = $applyAdjustments;
         $this->creditmemoSender = $creditmemoSender;
         $this->creditmemoRepository = $creditmemoRepository;
         $this->creditmemoManagement = $creditmemoManagement;
@@ -111,7 +103,7 @@ class CreditmemoByOrderIncrementId implements CreditmemoByOrderIncrementIdInterf
 
         ExtendedCreditMemoManagement::resetAmounts($newCreditmemo);
         ExtendedCreditMemoManagement::resetTax($newCreditmemo);
-        $this->applyAdjustments->execute($newCreditmemo, $creditmemo);
+        ExtendedCreditMemoManagement::applyAdjustments($newCreditmemo, $creditmemo);
 
         $newCreditmemo->collectTotals();
         $newCreditmemo->setState(Creditmemo::STATE_OPEN);
