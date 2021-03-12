@@ -42,38 +42,39 @@ class RefundableItemsFilter
     {
         $availableQuantity = $this->availableQuantityProvider->provide($order);
 
-        $validItemsToRefund = [];
         if ($hasAdjustment) {
-            return $this->getItemsWithoutQuantities($order);
+            return !empty($creditmemo->getItems()) ?
+                $this->determineValidItemsToRefund($order, $creditmemo, $availableQuantity, $hasAdjustment) :
+                $this->getItemsWithoutQuantities($order);
         }
 
-        foreach ($order->getAllItems() as $orderItem) {
-            foreach ($creditmemo->getItems() as $creditmemoItem) {
-                 if ($this->cantBeRefunded($orderItem, $creditmemoItem, $availableQuantity)) {
-                    continue;
-                 }
-
-                $validItemsToRefund[$orderItem->getId()] = $creditmemoItem->getQty();
-            }
-        }
-
-        return $validItemsToRefund;
+        return $this->determineValidItemsToRefund($order, $creditmemo, $availableQuantity);
     }
 
     /**
-     * If the credit memo is an adjustment
-     * We will not do any returns thus all specified skus
-     * in the order will have a zero quantity.
      * @param OrderInterface $order
+     * @param CreditmemoInterface $creditmemo
+     * @param array $availableQuantity
+     * @param bool $isAdjustment
      * @return array
+     * @author Alexander Wanyoike <amw@amp.co>
      */
-    private function getItemsWithoutQuantities(OrderInterface $order)
-    {
+    private function determineValidItemsToRefund(
+        OrderInterface $order,
+        CreditmemoInterface $creditmemo,
+        array $availableQuantity,
+        $isAdjustment = false
+    ) {
         $validItemsToRefund = [];
         foreach ($order->getAllItems() as $orderItem) {
-            $validItemsToRefund[$orderItem->getId()] = 0;
-        }
+            foreach ($creditmemo->getItems() as $creditmemoItem) {
+                if ($this->cantBeRefunded($orderItem, $creditmemoItem, $availableQuantity)) {
+                    continue;
+                }
 
+                $validItemsToRefund[$orderItem->getId()] = $isAdjustment ? 0 : $creditmemoItem->getQty();
+            }
+        }
         return $validItemsToRefund;
     }
 
@@ -92,5 +93,22 @@ class RefundableItemsFilter
         return $orderItem->getSku() !== $creditmemoItem->getSku()
             || $creditmemoItem->getQty() <= 0
             || $creditmemoItem->getQty() > $availableQuantity[$orderItem->getId()];
+    }
+
+    /**
+     * If the credit memo is an adjustment
+     * We will not do any returns thus all specified skus
+     * in the order will have a zero quantity.
+     * @param OrderInterface $order
+     * @return array
+     */
+    private function getItemsWithoutQuantities(OrderInterface $order)
+    {
+        $validItemsToRefund = [];
+        foreach ($order->getAllItems() as $orderItem) {
+            $validItemsToRefund[$orderItem->getId()] = 0;
+        }
+
+        return $validItemsToRefund;
     }
 }
