@@ -23,6 +23,21 @@ use SnowIO\ExtendedSalesRepositories\Exception\SnowCreditMemoException;
 class CreditmemoByOrderIncrementId implements CreditmemoByOrderIncrementIdInterface
 {
     /**
+     * @var RefundableItemsFilter
+     */
+    private $refundableItemsFilter;
+
+    /**
+     * @var ApplyAdjustments
+     */
+    private $applyAdjustments;
+
+    /**
+     * @var CreditmemoSender
+     */
+    private $creditmemoSender;
+
+    /**
      * @var CreditmemoManagementInterface
      */
     private $creditmemoManagement;
