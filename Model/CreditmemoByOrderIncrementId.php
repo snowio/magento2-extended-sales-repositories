@@ -142,9 +142,6 @@ class CreditmemoByOrderIncrementId implements CreditmemoByOrderIncrementIdInterf
     private function createCreditMemo(Order $order, CreditmemoInterface $creditmemo): Creditmemo
     {
         $refundableItems = $this->refundableItemsFilter->filter($order, $creditmemo);
-        if (empty($refundableItems)) {
-            throw new SnowCreditMemoException(__('No items available to refund'));
-        }
 
         if ($orderInvoice = $this->getLatestPaidInvoiceForOrder($order)) {
             return $this->creditmemoFactory->createByInvoice($orderInvoice, [
