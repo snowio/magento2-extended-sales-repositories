@@ -1,6 +1,7 @@
 <?php
 namespace SnowIO\ExtendedSalesRepositories\Exception;
 
+use Magento\Framework\Phrase;
 use Magento\Framework\Webapi\Exception;
 
 /**
