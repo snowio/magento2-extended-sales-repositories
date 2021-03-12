@@ -101,6 +101,7 @@ class RefundableItemsFilter
      * in the order will have a zero quantity.
      * @param OrderInterface $order
      * @return array
+     * @author Alexander Wanyoike <amw@amp.co>
      */
     private function getItemsWithoutQuantities(OrderInterface $order)
     {
