@@ -3,6 +3,11 @@ namespace SnowIO\ExtendedSalesRepositories\Model;
 
 use Magento\Sales\Api\Data\CreditmemoInterface;
 
+/**
+ * Class ExtendedCreditMemoManagement
+ *
+ * @package SnowIO\ExtendedSalesRepositories\Model
+ */
 class ExtendedCreditMemoManagement
 {
     /**
@@ -34,5 +39,17 @@ class ExtendedCreditMemoManagement
             ->setBaseShippingInclTax(0)
             ->setShippingInclTax(0)
             ->setBaseSubtotalInclTax(0);
+    }
+
+    /**
+     * @param CreditmemoInterface $newCreditMemo
+     * @param CreditmemoInterface $oldCreditMemo
+     * @author Alex Wanyoike <aw@amp.co>
+     */
+    public static function applyAdjustments(CreditmemoInterface $newCreditMemo, CreditmemoInterface $oldCreditMemo)
+    {
+        $newCreditMemo->setAdjustment($oldCreditMemo->getBaseAdjustment())
+            ->setAdjustmentPositive($oldCreditMemo->getBaseAdjustmentPositive())
+            ->setAdjustmentNegative($oldCreditMemo->getBaseAdjustmentNegative());
     }
 }
