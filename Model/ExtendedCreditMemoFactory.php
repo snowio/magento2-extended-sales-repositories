@@ -45,7 +45,7 @@ class ExtendedCreditMemoFactory
      */
     public function create(OrderInterface $order, CreditmemoInterface $creditmemo)
     {
-        $refundableItems = $this->refundableItemsFilter->filter($order, $creditmemo);
+        $refundableItems = $this->refundableItemsFilter->filter($order, $creditmemo, $this->hasAdjustments($creditmemo));
 
         if ($orderInvoice = $this->getLatestPaidInvoiceForOrder($order)) {
             return $this->creditmemoFactory->createByInvoice($orderInvoice, [
@@ -74,5 +74,12 @@ class ExtendedCreditMemoFactory
             ->getLastItem();
 
         return $latestInvoice->getId() ? $latestInvoice : null;
+    }
+
+    private function hasAdjustments(CreditmemoInterface $creditmemo)
+    {
+        return $creditmemo->getBaseAdjustmentNegative() !== null ||
+            $creditmemo->getBaseAdjustmentPositive() !== null ||
+            $creditmemo->getBaseAdjustment() !== null;
     }
 }
