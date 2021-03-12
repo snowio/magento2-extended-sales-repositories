@@ -22,13 +22,40 @@ use SnowIO\ExtendedSalesRepositories\Exception\SnowCreditMemoException;
 
 class CreditmemoByOrderIncrementId implements CreditmemoByOrderIncrementIdInterface
 {
-    private \Magento\Sales\Api\CreditmemoManagementInterface $creditmemoManagement;
+    /**
+     * @var RefundableItemsFilter
+     */
+    private $refundableItemsFilter;
 
-    private \Magento\Sales\Api\CreditmemoRepositoryInterface $creditmemoRepository;
+    /**
+     * @var ApplyAdjustments
+     */
+    private $applyAdjustments;
 
-    private \Magento\Sales\Api\OrderRepositoryInterface $orderRepository;
+    /**
+     * @var CreditmemoSender
+     */
+    private $creditmemoSender;
 
-    private \Magento\Sales\Model\Order\CreditmemoFactory $creditmemoFactory;
+    /**
+     * @var CreditmemoManagementInterface
+     */
+    private $creditmemoManagement;
+
+    /**
+     * @var CreditmemoRepositoryInterface
+     */
+    private $creditmemoRepository;
+
+    /**
+     * @var OrderRepositoryInterface
+     */
+    private $orderRepository;
+
+    /**
+     * @var CreditmemoFactory
+     */
+    private $creditmemoFactory;
 
     /**
      * @var LoggerInterface
