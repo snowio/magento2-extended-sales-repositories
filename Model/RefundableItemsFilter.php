@@ -3,7 +3,6 @@ namespace SnowIO\ExtendedSalesRepositories\Model;
 
 use Magento\Sales\Api\Data\CreditmemoInterface;
 use Magento\Sales\Api\Data\OrderInterface;
-use Magento\Sales\Api\Data\OrderItemInterface;
 
 /**
  * Class RefundableItemsFilter
@@ -49,10 +48,10 @@ class RefundableItemsFilter
                     || $creditmemoItem->getQty() <= 0
                     || $creditmemoItem->getQty() > $availableQuantity[$orderItem->getId()]
                 ) {
-                    continue;
+                    $validItemsToRefund[$orderItem->getId()] = 0;
+                } else {
+                    $validItemsToRefund[$orderItem->getId()] = $creditmemoItem->getQty();
                 }
-
-                $validItemsToRefund[$orderItem->getId()] = $creditmemoItem->getQty();
             }
         }
 
