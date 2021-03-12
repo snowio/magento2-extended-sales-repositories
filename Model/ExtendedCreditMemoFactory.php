@@ -64,6 +64,18 @@ class ExtendedCreditMemoFactory
     }
 
     /**
+     * @param CreditmemoInterface $creditmemo
+     * @return bool
+     * @author Alexander Wanyoike <amw@amp.co>
+     */
+    private function hasAdjustments(CreditmemoInterface $creditmemo)
+    {
+        return $creditmemo->getBaseAdjustmentNegative() !== null ||
+            $creditmemo->getBaseAdjustmentPositive() !== null ||
+            $creditmemo->getBaseAdjustment() !== null;
+    }
+
+    /**
      * Get latest invoice for order
      *
      * @param OrderInterface $order
@@ -79,12 +91,5 @@ class ExtendedCreditMemoFactory
             ->getLastItem();
 
         return $latestInvoice->getId() ? $latestInvoice : null;
-    }
-
-    private function hasAdjustments(CreditmemoInterface $creditmemo)
-    {
-        return $creditmemo->getBaseAdjustmentNegative() !== null ||
-            $creditmemo->getBaseAdjustmentPositive() !== null ||
-            $creditmemo->getBaseAdjustment() !== null;
     }
 }
