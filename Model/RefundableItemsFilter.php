@@ -44,10 +44,6 @@ class RefundableItemsFilter
         $validItemsToRefund = [];
         /** @var \Magento\Sales\Model\Order\Item $orderItem */
         foreach ($order->getAllItems() as $orderItem) {
-            if (!$this->isOrderItemRefundable($orderItem)) {
-                continue;
-            }
-
             foreach ($creditmemo->getItems() as $creditmemoItem) {
                 if ($orderItem->getSku() !== $creditmemoItem->getSku()
                     || $creditmemoItem->getQty() <= 0
@@ -61,27 +57,5 @@ class RefundableItemsFilter
         }
 
         return $validItemsToRefund;
-    }
-
-    /**
-     * Check if order item is refundable
-     *
-     * @param \Magento\Sales\Api\Data\OrderItemInterface|null $orderItem
-     * @return bool
-     * @author Daniel Doyle <dd@amp.co>
-     */
-    private function isOrderItemRefundable(?OrderItemInterface $orderItem) : bool
-    {
-        if (!$orderItem) {
-            return true;
-        }
-
-        $orderItemExtensionAttributes = $orderItem->getExtensionAttributes();
-        if (!$orderItemExtensionAttributes) {
-            return true;
-        }
-
-        return !filter_var($orderItemExtensionAttributes->getNotRefundable(), FILTER_VALIDATE_BOOLEAN)
-            && $this->execute($orderItem->getParentItem());
     }
 }
