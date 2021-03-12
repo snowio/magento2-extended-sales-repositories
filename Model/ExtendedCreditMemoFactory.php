@@ -6,6 +6,7 @@ use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order\Creditmemo;
 use Magento\Sales\Model\Order\CreditmemoFactory;
 use Magento\Sales\Model\Order\Invoice;
+use SnowIO\ExtendedSalesRepositories\Exception\SnowCreditMemoException;
 
 /**
  * Class AvailableQuantityProvider
@@ -41,11 +42,15 @@ class ExtendedCreditMemoFactory
      * @param OrderInterface $order
      * @param CreditmemoInterface $creditmemo
      * @return Creditmemo
+     * @throws SnowCreditMemoException
      * @author Alexander Wanyoike <amw@amp.co>
      */
     public function create(OrderInterface $order, CreditmemoInterface $creditmemo)
     {
         $refundableItems = $this->refundableItemsFilter->filter($order, $creditmemo, $this->hasAdjustments($creditmemo));
+        if (empty($refundableItems) && !$this->hasAdjustments($creditmemo)) {
+            throw new SnowCreditMemoException(__('No items available to refund'));
+        }
 
         if ($orderInvoice = $this->getLatestPaidInvoiceForOrder($order)) {
             return $this->creditmemoFactory->createByInvoice($orderInvoice, [
