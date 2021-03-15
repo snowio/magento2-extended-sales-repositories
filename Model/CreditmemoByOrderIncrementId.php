@@ -103,7 +103,6 @@ class CreditmemoByOrderIncrementId implements CreditmemoByOrderIncrementIdInterf
 
         ExtendedCreditMemoManagement::applyAmounts($newCreditmemo, $creditmemo);
         ExtendedCreditMemoManagement::applyTax($newCreditmemo, $creditmemo);
-        ExtendedCreditMemoManagement::applyAdjustments($newCreditmemo, $creditmemo);
 
         $newCreditmemo->collectTotals();
         $newCreditmemo->setState(Creditmemo::STATE_OPEN);

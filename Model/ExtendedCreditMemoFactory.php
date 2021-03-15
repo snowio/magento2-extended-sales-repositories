@@ -54,12 +54,18 @@ class ExtendedCreditMemoFactory
 
         if ($orderInvoice = $this->getLatestPaidInvoiceForOrder($order)) {
             return $this->creditmemoFactory->createByInvoice($orderInvoice, [
-                'qtys' => $refundableItems
+                'qtys' => $refundableItems,
+                'shipping_amount' => $creditmemo->getShippingAmount(),
+                'adjustment_positive' => $creditmemo->getBaseAdjustmentPositive(),
+                'adjustment_negative' => $creditmemo->getBaseAdjustmentNegative()
             ]);
         }
 
         return $this->creditmemoFactory->createByOrder($order, [
-            'qtys' => $refundableItems
+            'qtys' => $refundableItems,
+            'shipping_amount' => $creditmemo->getShippingAmount(),
+            'adjustment_positive' => $creditmemo->getBaseAdjustmentPositive(),
+            'adjustment_negative' => $creditmemo->getBaseAdjustmentNegative()
         ]);
     }
 
