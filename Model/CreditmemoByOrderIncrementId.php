@@ -101,8 +101,8 @@ class CreditmemoByOrderIncrementId implements CreditmemoByOrderIncrementIdInterf
 
         $this->addBackToStockStatus($order, $creditmemo, $newCreditmemo);
 
-        ExtendedCreditMemoManagement::resetAmounts($newCreditmemo);
-        ExtendedCreditMemoManagement::resetTax($newCreditmemo);
+        ExtendedCreditMemoManagement::applyAmounts($newCreditmemo, $creditmemo);
+        ExtendedCreditMemoManagement::applyTax($newCreditmemo, $creditmemo);
         ExtendedCreditMemoManagement::applyAdjustments($newCreditmemo, $creditmemo);
 
         $newCreditmemo->collectTotals();
