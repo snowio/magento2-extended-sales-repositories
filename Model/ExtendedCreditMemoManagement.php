@@ -19,7 +19,6 @@ class ExtendedCreditMemoManagement
     public static function applyAmounts(CreditmemoInterface $creditmemo, CreditmemoInterface $inputCreditmemo)
     {
         $creditmemo
-            ->setBaseShippingAmount($inputCreditmemo->getBaseShippingAmount())
             ->setShippingAmount($inputCreditmemo->getShippingAmount())
             ->setBaseSubtotal($inputCreditmemo->getBaseSubtotal())
             ->setBaseGrandTotal($inputCreditmemo->getBaseGrandTotal())
@@ -38,20 +37,7 @@ class ExtendedCreditMemoManagement
             ->setTaxAmount($inputCreditmemo->getTaxAmount())
             ->setBaseShippingTaxAmount($inputCreditmemo->getBaseShippingTaxAmount())
             ->setShippingTaxAmount($inputCreditmemo->getShippingTaxAmount())
-            ->setBaseShippingInclTax($inputCreditmemo->getBaseShippingInclTax())
             ->setShippingInclTax($inputCreditmemo->getShippingInclTax())
             ->setBaseSubtotalInclTax($inputCreditmemo->getBaseSubtotalInclTax());
-    }
-
-    /**
-     * @param CreditmemoInterface $creditmemo
-     * @param CreditmemoInterface $inputCreditmemo
-     * @author Alex Wanyoike <aw@amp.co>
-     */
-    public static function applyAdjustments(CreditmemoInterface $creditmemo, CreditmemoInterface $inputCreditmemo)
-    {
-        $creditmemo->setAdjustment($inputCreditmemo->getBaseAdjustment())
-            ->setAdjustmentPositive($inputCreditmemo->getBaseAdjustmentPositive())
-            ->setAdjustmentNegative($inputCreditmemo->getBaseAdjustmentNegative());
     }
 }
