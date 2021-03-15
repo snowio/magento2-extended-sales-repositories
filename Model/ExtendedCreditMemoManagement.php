@@ -11,45 +11,47 @@ use Magento\Sales\Api\Data\CreditmemoInterface;
 class ExtendedCreditMemoManagement
 {
     /**
-     * Never return the shipping amount
+     * Apply Amounts accordingly based on input credit memo
      * @param CreditmemoInterface $creditmemo
+     * @param CreditmemoInterface $inputCreditmemo
      * @author Alexander Wanyoike <aw@amp.co>
      */
-    public static function resetAmounts(CreditmemoInterface $creditmemo)
+    public static function applyAmounts(CreditmemoInterface $creditmemo, CreditmemoInterface $inputCreditmemo)
     {
         $creditmemo
-            ->setBaseShippingAmount(0)
-            ->setShippingAmount(0)
-            ->setBaseSubtotal(0)
-            ->setBaseGrandTotal(0)
-            ->setGrandTotal(0);
+            ->setBaseShippingAmount($inputCreditmemo->getBaseShippingAmount())
+            ->setShippingAmount($inputCreditmemo->getShippingAmount())
+            ->setBaseSubtotal($inputCreditmemo->getBaseSubtotal())
+            ->setBaseGrandTotal($inputCreditmemo->getBaseGrandTotal())
+            ->setGrandTotal($inputCreditmemo->getGrandTotal());
     }
 
     /**
-     * Reset tax calculations
+     * Apply tax calculations from the input
      * @param CreditmemoInterface $creditmemo
+     * @param CreditmemoInterface $inputCreditmemo
      * @author Alexander Wanyoike <aw@amp.co>
      */
-    public static function resetTax(CreditmemoInterface $creditmemo)
+    public static function applyTax(CreditmemoInterface $creditmemo, CreditmemoInterface $inputCreditmemo)
     {
-        $creditmemo->setBaseTaxAmount(0)
-            ->setTaxAmount(0)
-            ->setBaseShippingTaxAmount(0)
-            ->setShippingTaxAmount(0)
-            ->setBaseShippingInclTax(0)
-            ->setShippingInclTax(0)
-            ->setBaseSubtotalInclTax(0);
+        $creditmemo->setBaseTaxAmount($inputCreditmemo->getBaseTaxAmount())
+            ->setTaxAmount($inputCreditmemo->getTaxAmount())
+            ->setBaseShippingTaxAmount($inputCreditmemo->getBaseShippingTaxAmount())
+            ->setShippingTaxAmount($inputCreditmemo->getShippingTaxAmount())
+            ->setBaseShippingInclTax($inputCreditmemo->getBaseShippingInclTax())
+            ->setShippingInclTax($inputCreditmemo->getShippingInclTax())
+            ->setBaseSubtotalInclTax($inputCreditmemo->getBaseSubtotalInclTax());
     }
 
     /**
-     * @param CreditmemoInterface $newCreditMemo
-     * @param CreditmemoInterface $oldCreditMemo
+     * @param CreditmemoInterface $creditmemo
+     * @param CreditmemoInterface $inputCreditmemo
      * @author Alex Wanyoike <aw@amp.co>
      */
-    public static function applyAdjustments(CreditmemoInterface $newCreditMemo, CreditmemoInterface $oldCreditMemo)
+    public static function applyAdjustments(CreditmemoInterface $creditmemo, CreditmemoInterface $inputCreditmemo)
     {
-        $newCreditMemo->setAdjustment($oldCreditMemo->getBaseAdjustment())
-            ->setAdjustmentPositive($oldCreditMemo->getBaseAdjustmentPositive())
-            ->setAdjustmentNegative($oldCreditMemo->getBaseAdjustmentNegative());
+        $creditmemo->setAdjustment($inputCreditmemo->getBaseAdjustment())
+            ->setAdjustmentPositive($inputCreditmemo->getBaseAdjustmentPositive())
+            ->setAdjustmentNegative($inputCreditmemo->getBaseAdjustmentNegative());
     }
 }
