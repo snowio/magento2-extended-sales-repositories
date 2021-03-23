@@ -40,4 +40,15 @@ class ExtendedCreditMemoManagement
             ->setShippingInclTax($inputCreditmemo->getShippingInclTax())
             ->setBaseSubtotalInclTax($inputCreditmemo->getBaseSubtotalInclTax());
     }
+
+    public static function applyExtensionAttributes(
+        CreditmemoInterface $creditmemo,
+        CreditmemoInterface $inputCreditMemo
+    ) {
+        $extensionAttributes = $inputCreditMemo->getExtensionAttributes();
+        if (!$extensionAttributes) {
+            return;
+        }
+        $creditmemo->setExtensionAttributes($extensionAttributes);
+    }
 }
