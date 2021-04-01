@@ -101,10 +101,7 @@ class CreditmemoByOrderIncrementId implements CreditmemoByOrderIncrementIdInterf
 
         $this->addBackToStockStatus($order, $creditmemo, $newCreditmemo);
 
-        ExtendedCreditMemoManagement::applyAmounts($newCreditmemo, $creditmemo);
-        ExtendedCreditMemoManagement::applyTax($newCreditmemo, $creditmemo);
-        ExtendedCreditMemoManagement::applyExtensionAttributes($newCreditmemo, $creditmemo);
-
+        $this->applyDefaults($newCreditmemo, $creditmemo);
         $newCreditmemo->collectTotals();
         $newCreditmemo->setState(Creditmemo::STATE_OPEN);
         $this->creditmemoRepository->save($newCreditmemo);
@@ -124,6 +121,18 @@ class CreditmemoByOrderIncrementId implements CreditmemoByOrderIncrementIdInterf
         }
 
         return $newCreditmemo;
+    }
+
+    /**
+     * Applies defaults to the new credit memo
+     * @param CreditmemoInterface $newCreditmemo
+     * @param CreditmemoInterface $creditmemo
+     */
+    public function applyDefaults(CreditmemoInterface $newCreditmemo, CreditmemoInterface $creditmemo)
+    {
+        ExtendedCreditMemoManagement::applyAmounts($newCreditmemo, $creditmemo);
+        ExtendedCreditMemoManagement::applyTax($newCreditmemo, $creditmemo);
+        ExtendedCreditMemoManagement::applyExtensionAttributes($newCreditmemo, $creditmemo);
     }
 
     /**
