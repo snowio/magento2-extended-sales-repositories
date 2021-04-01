@@ -9,7 +9,6 @@ use Magento\Sales\Api\Data\CreditmemoInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Api\CreditmemoManagementInterface;
 use Magento\Sales\Api\CreditmemoRepositoryInterface;
-use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Creditmemo;
 use Magento\Sales\Model\Order\Creditmemo\Item;
 use Magento\Sales\Model\Order\Email\Sender\CreditmemoSender;
