@@ -96,6 +96,6 @@ class ExtendedCreditMemoFactory
             ->setCurPage(1)
             ->getLastItem();
 
-        return $latestInvoice->getId() ? $latestInvoice : null;
+        return $latestInvoice->getId() !== null ? $latestInvoice : null;
     }
 }
