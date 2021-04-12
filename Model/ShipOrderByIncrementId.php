@@ -1,15 +1,13 @@
 <?php
 namespace SnowIO\ExtendedSalesRepositories\Model;
 
-use Magento\Framework\Api\Filter;
-use Magento\Framework\Api\Search\FilterGroup;
-use Magento\Framework\Api\SearchCriteria;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Api\ShipOrderInterface;
 use SnowIO\ExtendedSalesRepositories\Api\ShipOrderByIncrementIdInterface;
 
 class ShipOrderByIncrementId implements ShipOrderByIncrementIdInterface
 {
+    use LoadOrderByIncrementIdTrait;
 
     private \Magento\Sales\Api\ShipOrderInterface $shipOrder;
     private \Magento\Sales\Api\OrderRepositoryInterface $orderRepository;
@@ -41,26 +39,5 @@ class ShipOrderByIncrementId implements ShipOrderByIncrementIdInterface
             $packages,
             $arguments
         );
-    }
-
-    private function loadOrderByIncrementId(string $incrementId)
-    {
-        $searchCriteria = (new SearchCriteria())
-            ->setFilterGroups([
-                (new FilterGroup)->setFilters([
-                    (new Filter)
-                        ->setField('increment_id')
-                        ->setConditionType('eq')
-                        ->setValue($incrementId)
-                ])
-            ]);
-
-        $order = $this->orderRepository->getList($searchCriteria)->getItems();
-
-        if (empty($order)) {
-            throw new \LogicException("No order exists with increment ID '$incrementId'.");
-        }
-
-        return reset($order);
     }
 }

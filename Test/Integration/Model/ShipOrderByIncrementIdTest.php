@@ -4,41 +4,51 @@ namespace SnowIO\ExtendedSalesRepositories\Test\Integration\Plugin;
 
 use Magento\Sales\Api\Data\ShipmentInterface;
 use Magento\Sales\Api\Data\ShipmentItemCreationInterface;
-use Magento\Sales\Api\Data\ShipmentItemInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Api\ShipmentRepositoryInterface;
+use Magento\Sales\Model\Order\Item;
 use Magento\TestFramework\Helper\Bootstrap;
 use SnowIO\ExtendedSalesRepositories\Api\ShipOrderByIncrementIdInterface;
+use SnowIO\ExtendedSalesRepositories\Model\LoadOrderByIncrementIdTrait;
 use SnowIO\ExtendedSalesRepositories\Test\TestCase;
 
 class ShipOrderByIncrementIdTest extends TestCase
 {
+    use LoadOrderByIncrementIdTrait;
+
     private $objectManager;
     /** @var ShipOrderByIncrementIdInterface */
     private $shipOrderByIncrementId;
     /** @var ShipmentRepositoryInterface */
     private $shipmentRepository;
+    /** @var OrderRepositoryInterface */
+    private $orderRepository;
 
     public function __construct($name = null, array $data = array(), $dataName = '')
     {
         parent::__construct($name, $data, $dataName);
         $this->objectManager = Bootstrap::getObjectManager();
         $this->shipOrderByIncrementId = $this->objectManager->get(ShipOrderByIncrementIdInterface::class);
+        $this->orderRepository = $this->objectManager->get(OrderRepositoryInterface::class);
         $this->shipmentRepository = $this->objectManager->get(ShipmentRepositoryInterface::class);
     }
 
     /**
      * @magentoDataFixture SnowIO_ExtendedSalesRepositories::Test/Integration/_files/order.php
-     * @dataProvider getStandardCaseTestData
-     * @param array $items
-     * @param array $assertions
      */
-    public function testStandardCase(array $items, array $assertions)
+    public function testStandardCase()
     {
-        $shipmentId = $this->shipOrderByIncrementId->execute("100000001", $items);
-        foreach ($assertions as $assertion) {
-            $assertion($items, $shipmentId);
-        }
+        $orderIncrementId = "100000001";
+        $order = $this->loadOrderByIncrementId($orderIncrementId);
+        $items = array_map(function (Item $orderItem) {
+           return $this->objectManager
+                ->create(ShipmentItemCreationInterface::class)
+                ->setQty(1)
+                ->setOrderItemId($orderItem->getId());
+        }, $order->getItems());
+        $shipmentId = $this->shipOrderByIncrementId->execute($orderIncrementId, $items);
+        $this->assertShipmentContainsCorrectItems($items, $shipmentId);
+
     }
 
     /**
@@ -52,23 +62,6 @@ class ShipOrderByIncrementIdTest extends TestCase
     {
         $this->expectException($errorClass);
         $this->shipOrderByIncrementId->execute($orderIncrementId, $items);
-    }
-
-    public function getStandardCaseTestData()
-    {
-        return [
-            "should ship an order using the increment id" => [
-                [
-                    $this->objectManager
-                        ->create(ShipmentItemCreationInterface::class)
-                        ->setOrderItemId(1)
-                        ->setQty(1)
-                ],
-                [
-                    $this->assertShipmentContainsCorrectItems()
-                ]
-            ]
-        ];
     }
 
     public function getErroneousCaseTestData()
@@ -86,9 +79,8 @@ class ShipOrderByIncrementIdTest extends TestCase
         ];
     }
 
-    public function assertShipmentContainsCorrectItems()
+    public function assertShipmentContainsCorrectItems(array $items, string $shipmentId)
     {
-        return function (array $items, string $shipmentId) {
             /** @var ShipmentInterface $shipment */
             $shipment = $this->shipmentRepository->get($shipmentId);
 
@@ -99,8 +91,6 @@ class ShipOrderByIncrementIdTest extends TestCase
                 ];
             }
 
-            var_dump($shipmentItemByOrderItemId);
-
             $inputItemsBySku = [];
             foreach ($items as $item) {
                 $inputItemsBySku[$item->getOrderItemId()] = [
@@ -109,6 +99,5 @@ class ShipOrderByIncrementIdTest extends TestCase
             }
 
             self::assertEquals($inputItemsBySku, $shipmentItemByOrderItemId);
-        };
     }
 }
