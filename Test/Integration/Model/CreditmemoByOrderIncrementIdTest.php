@@ -56,7 +56,6 @@ class CreditmemoByOrderIncrementIdTest extends TestCase
         $this->creditmemoByOrderIncrementId->createAndRefund("100000001", $creditmemo);
     }
 
-
     public function getStandardCaseTestData()
     {
         return [

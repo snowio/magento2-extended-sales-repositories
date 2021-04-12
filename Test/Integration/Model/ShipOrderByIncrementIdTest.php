@@ -41,7 +41,7 @@ class ShipOrderByIncrementIdTest extends TestCase
         $orderIncrementId = "100000001";
         $order = $this->loadOrderByIncrementId($orderIncrementId);
         $items = array_map(function (Item $orderItem) {
-           return $this->objectManager
+            return $this->objectManager
                 ->create(ShipmentItemCreationInterface::class)
                 ->setQty(1)
                 ->setOrderItemId($orderItem->getId());
@@ -81,23 +81,23 @@ class ShipOrderByIncrementIdTest extends TestCase
 
     public function assertShipmentContainsCorrectItems(array $items, string $shipmentId)
     {
-            /** @var ShipmentInterface $shipment */
-            $shipment = $this->shipmentRepository->get($shipmentId);
+        /** @var ShipmentInterface $shipment */
+        $shipment = $this->shipmentRepository->get($shipmentId);
 
-            $shipmentItemByOrderItemId = [];
-            foreach ($shipment->getItems() as $shipmentItem) {
-                $shipmentItemByOrderItemId[$shipmentItem->getOrderItemId()] = [
-                    'qty' => $shipmentItem->getQty(),
-                ];
-            }
+        $shipmentItemByOrderItemId = [];
+        foreach ($shipment->getItems() as $shipmentItem) {
+            $shipmentItemByOrderItemId[$shipmentItem->getOrderItemId()] = [
+                'qty' => $shipmentItem->getQty(),
+            ];
+        }
 
-            $inputItemsBySku = [];
-            foreach ($items as $item) {
-                $inputItemsBySku[$item->getOrderItemId()] = [
-                    'qty' => $item->getQty()
-                ];
-            }
+        $inputItemsBySku = [];
+        foreach ($items as $item) {
+            $inputItemsBySku[$item->getOrderItemId()] = [
+                'qty' => $item->getQty()
+            ];
+        }
 
-            self::assertEquals($inputItemsBySku, $shipmentItemByOrderItemId);
+        self::assertEquals($inputItemsBySku, $shipmentItemByOrderItemId);
     }
 }
