@@ -1,17 +1,13 @@
 language: php
 php:
   - 7.3
-  - 7.4
 dist: xenial
 
 env:
   matrix:
     - TEST_GROUP=magento_latest
-    - TEST_GROUP=magento_23
 matrix:
   exclude:
-    - php: 7.4
-      env: TEST_GROUP=magento_23
     - php: 7.3
       env: TEST_GROUP=magento_latest
 
