@@ -19,7 +19,11 @@ if (!is_file($magentoPath . '/app/etc/di.xml')) {
 $configPath = "$magentoPath/dev/tests/integration/phpunit.xml.dist";
 $travisBuildDir = getenv('TRAVIS_BUILD_DIR');
 echo "Travis build dir is $travisBuildDir" . PHP_EOL;
-$packageName = \exec("composer config name -d $travisBuildDir");
+$packageName = \exec("composer config name -d $travisBuildDir", $output, $returnVal);
+if ($returnVal!=0) {
+    var_dump($output);
+    throw new \Exception("Could not get composer config name for $travisBuildDir");
+}
 
 $config = new \SimpleXMLElement($configPath, 0, true);
 
