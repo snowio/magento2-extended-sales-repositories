@@ -7,7 +7,7 @@ use Magento\Sales\Api\Data\ShipmentItemInterface;
 use Magento\Sales\Model\OrderFactory;
 use Magento\TestFramework\Helper\Bootstrap;
 
-class ShipmentRepositoryTest extends \PHPUnit_Framework_TestCase
+class ShipmentRepositoryTest extends \PHPUnit\Framework\TestCase
 {
 
     private $objectManager;
