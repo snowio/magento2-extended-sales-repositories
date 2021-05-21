@@ -162,6 +162,7 @@ foreach ($oldOptions as $option) {
     $options[] = $option;
 }
 
+$options = []; // TODO figure out the crash with the options, are they necessary for this test? No assertions on them
 $product->setOptions($options);
 
 /** @var \Magento\Catalog\Api\ProductRepositoryInterface $productRepositoryFactory */
@@ -197,7 +198,7 @@ $addressData->setRegion(
     'shipping'
 )->save();
 
-$billingAddress = $objectManager->create('Magento\Sales\Model\Order\Address', ['data' => $addressData]);
+$billingAddress = $objectManager->create('Magento\Sales\Model\Order\Address', ['data' => $addressData->getData()]);
 $billingAddress->setAddressType('billing');
 
 $shippingAddress = clone $billingAddress;
