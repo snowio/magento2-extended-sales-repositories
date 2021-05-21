@@ -7,7 +7,7 @@ dist: xenial
 env:
   matrix:
     - TEST_GROUP=magento_latest
-    - TEST_GROUP=magento_23
+#    - TEST_GROUP=magento_23
 matrix:
   exclude:
     - php: 7.4
