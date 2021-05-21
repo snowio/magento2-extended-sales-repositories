@@ -21,6 +21,13 @@
         }
     },
     "require-dev": {
-        "rector/rector": "^0.8.56"
+        "rector/rector": "^0.8.56",
+        "ampersand/travis-vanilla-magento": "^1.0"
+    },
+    "repositories": {
+        "foomanmirror": {
+            "type": "composer",
+            "url": "https://repo-magento-mirror.fooman.co.nz/"
+        }
     }
 }
