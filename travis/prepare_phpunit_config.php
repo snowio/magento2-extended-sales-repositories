@@ -1,5 +1,6 @@
 <?php
 $magentoPath = getcwd();
+echo "Current working directory" . $magentoPath . PHP_EOL;
 if (isset($argv[1])) {
     $suggestedPath = realpath($argv[1]);
     if ($suggestedPath) {

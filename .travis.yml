@@ -34,6 +34,7 @@ install:
   # Configure for integration tests
   - mysql -uroot -e 'SET @@global.sql_mode = NO_ENGINE_SUBSTITUTION; DROP DATABASE IF EXISTS magento_integration_tests; CREATE DATABASE magento_integration_tests;'
   - cp dev/tests/integration/etc/install-config-mysql.travis-no-rabbitmq.php.dist dev/tests/integration/etc/install-config-mysql.php
+  - pwd && cd . && pwd
   - php $TRAVIS_BUILD_DIR/travis/prepare_phpunit_config.php
 
 script:
