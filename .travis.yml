@@ -20,6 +20,8 @@ before_install:
   - composer self-update --1
 
 install:
+  - export COMPOSER_MEMORY_LIMIT=-1
+  - export COMPOSER_PACKAGE_NAME=$(composer config name)
   - composer install --no-interaction
   # Install magento
   - if [[ $TEST_GROUP = magento_23 ]];     then  NAME=snowmodule FULL_INSTALL=0 VERSION=2.3.6-p1 . ./vendor/bin/travis-install-magento.sh; fi
@@ -28,11 +30,11 @@ install:
   - cd vendor/ampersand/travis-vanilla-magento/instances/snowmodule
   - export COMPOSER_MEMORY_LIMIT=-1
   - composer config repo.snowmodule git "$TRAVIS_BUILD_DIR"
-  - composer require -vvv snowio/magento2-extended-product-repository:"dev-$TRAVIS_BRANCH" || composer require -vvv snowio/magento2-extended-product-repository:"$TRAVIS_BRANCH"
+  - composer require -vvv $COMPOSER_PACKAGE_NAME:"dev-$TRAVIS_BRANCH" || composer require -vvv $COMPOSER_PACKAGE_NAME:"$TRAVIS_BRANCH"
   # Configure for integration tests
   - mysql -uroot -e 'SET @@global.sql_mode = NO_ENGINE_SUBSTITUTION; DROP DATABASE IF EXISTS magento_integration_tests; CREATE DATABASE magento_integration_tests;'
   - cp dev/tests/integration/etc/install-config-mysql.travis-no-rabbitmq.php.dist dev/tests/integration/etc/install-config-mysql.php
-  - php $TRAVIS_BUILD_DIR/travis/prepare_phpunit_config.php $TRAVIS_BUILD_DIR/vendor/ampersand/travis-vanilla-magento/instances/snowmodule
+  - php $TRAVIS_BUILD_DIR/travis/prepare_phpunit_config.php
 
 script:
   - vendor/bin/phpunit -c $(pwd)/dev/tests/integration/phpunit.xml.dist --testsuite Integration
