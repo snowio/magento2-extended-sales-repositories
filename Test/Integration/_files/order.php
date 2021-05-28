@@ -1,37 +1,105 @@
 <?php
-/** @var \Magento\Framework\Registry $registry */
+use Magento\Catalog\Api\CategoryLinkManagementInterface;
+use Magento\Catalog\Api\Data\ProductTierPriceExtensionFactory;
+use Magento\Catalog\Api\Data\ProductExtensionInterfaceFactory;
+use Magento\Catalog\Api\Data\ProductTierPriceInterfaceFactory;
+use Magento\Catalog\Api\ProductRepositoryInterface;
+use Magento\Catalog\Model\Indexer\Product\Price\Processor;
+use Magento\Catalog\Model\Product;
+use Magento\Catalog\Model\Product\Attribute\Source\Status;
+use Magento\Catalog\Model\Product\Type;
+use Magento\Catalog\Model\Product\Visibility;
+use Magento\Customer\Model\Group;
+use Magento\Framework\DB\Transaction;
+use Magento\Sales\Api\Data\InvoiceInterface;
+use Magento\Sales\Api\InvoiceManagementInterface;
+use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Sales\Model\Order;
+use Magento\Sales\Model\Order\Address;
+use Magento\Sales\Model\Order\Item;
+use Magento\Sales\Model\Order\Payment;
+use Magento\Store\Api\WebsiteRepositoryInterface;
+use Magento\Store\Model\StoreManagerInterface;
 use Magento\TestFramework\Helper\Bootstrap;
 
-$registry = Bootstrap::getObjectManager()->get('Magento\Framework\Registry');
-$registry->unregister('isSecureArea');
-$registry->register('isSecureArea', true);
-
-/** @var $order \Magento\Sales\Model\Order */
-$orderCollection = Bootstrap::getObjectManager()->create('Magento\Sales\Model\ResourceModel\Order\Collection');
-foreach ($orderCollection as $order) {
-    $order->delete();
-}
-
-/** @var $product \Magento\Catalog\Model\Product */
-$productCollection = Bootstrap::getObjectManager()->create('Magento\Catalog\Model\ResourceModel\Product\Collection');
-foreach ($productCollection as $product) {
-    $product->delete();
-}
-
-$registry->unregister('isSecureArea');
-$registry->register('isSecureArea', false);
-
-
 /** @var \Magento\TestFramework\ObjectManager $objectManager */
-$objectManager = \Magento\TestFramework\Helper\Bootstrap::getObjectManager();
+$objectManager = Bootstrap::getObjectManager();
 
-/** @var \Magento\Catalog\Api\CategoryLinkManagementInterface $categoryLinkManagement */
-$categoryLinkManagement = $objectManager->create('Magento\Catalog\Api\CategoryLinkManagementInterface');
+/** @var CategoryLinkManagementInterface $categoryLinkManagement */
+$categoryLinkManagement = $objectManager->get(CategoryLinkManagementInterface::class);
 
-/** @var $product \Magento\Catalog\Model\Product */
-$product = $objectManager->create('Magento\Catalog\Model\Product');
+$tierPrices = [];
+/** @var ProductTierPriceInterfaceFactory $tierPriceFactory */
+$tierPriceFactory = $objectManager->get(ProductTierPriceInterfaceFactory::class);
+/** @var  $tpExtensionAttributes */
+$tpExtensionAttributesFactory = $objectManager->get(ProductTierPriceExtensionFactory::class);
+/** @var  $productExtensionAttributes */
+$productExtensionAttributesFactory = $objectManager->get(ProductExtensionInterfaceFactory::class);
+
+$adminWebsite = $objectManager->get(WebsiteRepositoryInterface::class)->get('admin');
+$tierPriceExtensionAttributes1 = $tpExtensionAttributesFactory->create()
+    ->setWebsiteId($adminWebsite->getId());
+$productExtensionAttributesWebsiteIds = $productExtensionAttributesFactory->create(
+    ['website_ids' => $adminWebsite->getId()]
+);
+
+$tierPrices[] = $tierPriceFactory->create(
+    [
+        'data' => [
+            'customer_group_id' => Group::CUST_GROUP_ALL,
+            'qty' => 2,
+            'value' => 8
+        ]
+    ]
+)->setExtensionAttributes($tierPriceExtensionAttributes1);
+
+$tierPrices[] = $tierPriceFactory->create(
+    [
+        'data' => [
+            'customer_group_id' => Group::CUST_GROUP_ALL,
+            'qty' => 5,
+            'value' => 5
+        ]
+    ]
+)->setExtensionAttributes($tierPriceExtensionAttributes1);
+
+$tierPrices[] = $tierPriceFactory->create(
+    [
+        'data' => [
+            'customer_group_id' => Group::NOT_LOGGED_IN_ID,
+            'qty' => 3,
+            'value' => 5
+        ]
+    ]
+)->setExtensionAttributes($tierPriceExtensionAttributes1);
+
+$tierPrices[] = $tierPriceFactory->create(
+    [
+        'data' => [
+            'customer_group_id' => Group::NOT_LOGGED_IN_ID,
+            'qty' => 3.2,
+            'value' => 6,
+        ]
+    ]
+)->setExtensionAttributes($tierPriceExtensionAttributes1);
+
+$tierPriceExtensionAttributes2 = $tpExtensionAttributesFactory->create()
+    ->setWebsiteId($adminWebsite->getId())
+    ->setPercentageValue(50);
+
+$tierPrices[] = $tierPriceFactory->create(
+    [
+        'data' => [
+            'customer_group_id' => Group::NOT_LOGGED_IN_ID,
+            'qty' => 10
+        ]
+    ]
+)->setExtensionAttributes($tierPriceExtensionAttributes2);
+
+/** @var $product Product */
+$product = $objectManager->create(Product::class);
 $product->isObjectNew(true);
-$product->setTypeId(\Magento\Catalog\Model\Product\Type::TYPE_SIMPLE)
+$product->setTypeId(Type::TYPE_SIMPLE)
     ->setId(1)
     ->setAttributeSetId(4)
     ->setWebsiteIds([1])
@@ -41,34 +109,14 @@ $product->setTypeId(\Magento\Catalog\Model\Product\Type::TYPE_SIMPLE)
     ->setWeight(1)
     ->setShortDescription("Short description")
     ->setTaxClassId(0)
-    ->setTierPrice(
-        [
-            [
-                'website_id' => 0,
-                'cust_group' => \Magento\Customer\Model\Group::CUST_GROUP_ALL,
-                'price_qty'  => 2,
-                'price'      => 8,
-            ],
-            [
-                'website_id' => 0,
-                'cust_group' => \Magento\Customer\Model\Group::CUST_GROUP_ALL,
-                'price_qty'  => 5,
-                'price'      => 5,
-            ],
-            [
-                'website_id' => 0,
-                'cust_group' => \Magento\Customer\Model\Group::NOT_LOGGED_IN_ID,
-                'price_qty'  => 3,
-                'price'      => 5,
-            ],
-        ]
-    )
+    ->setTierPrices($tierPrices)
     ->setDescription('Description with <b>html tag</b>')
+    ->setExtensionAttributes($productExtensionAttributesWebsiteIds)
     ->setMetaTitle('meta title')
     ->setMetaKeyword('meta keyword')
     ->setMetaDescription('meta description')
-    ->setVisibility(\Magento\Catalog\Model\Product\Visibility::VISIBILITY_BOTH)
-    ->setStatus(\Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_ENABLED)
+    ->setVisibility(Visibility::VISIBILITY_BOTH)
+    ->setStatus(Status::STATUS_ENABLED)
     ->setStockData(
         [
             'use_config_manage_stock'   => 1,
@@ -152,7 +200,7 @@ $oldOptions = [
 $options = [];
 
 /** @var \Magento\Catalog\Api\Data\ProductCustomOptionInterfaceFactory $customOptionFactory */
-$customOptionFactory = $objectManager->create('Magento\Catalog\Api\Data\ProductCustomOptionInterfaceFactory');
+$customOptionFactory = $objectManager->create(\Magento\Catalog\Api\Data\ProductCustomOptionInterfaceFactory::class);
 
 foreach ($oldOptions as $option) {
     /** @var \Magento\Catalog\Api\Data\ProductCustomOptionInterface $option */
@@ -164,85 +212,80 @@ foreach ($oldOptions as $option) {
 
 $product->setOptions($options);
 
-/** @var \Magento\Catalog\Api\ProductRepositoryInterface $productRepositoryFactory */
-$productRepositoryFactory = $objectManager->create('Magento\Catalog\Api\ProductRepositoryInterface');
-$productRepositoryFactory->save($product);
+/** @var ProductRepositoryInterface $productRepository */
+$productRepository = $objectManager->create(ProductRepositoryInterface::class);
+$product = $productRepository->save($product);
+$indexerProcessor = $objectManager->get(Processor::class);
+$indexerProcessor->reindexRow($product->getId());
 
 $categoryLinkManagement->assignProductToCategories(
     $product->getSku(),
     [2]
 );
 
-//Address
-$addressData = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create('Magento\Sales\Model\Order\Address');
-$addressData->setRegion(
-    'CA'
-)->setPostcode(
-    '90210'
-)->setFirstname(
-    'a_unique_firstname'
-)->setLastname(
-    'lastname'
-)->setStreet(
-    'street'
-)->setCity(
-    'Beverly Hills'
-)->setEmail(
-    'admin@example.com'
-)->setTelephone(
-    '1111111111'
-)->setCountryId(
-    'US'
-)->setAddressType(
-    'shipping'
-)->save();
 
-$billingAddress = $objectManager->create('Magento\Sales\Model\Order\Address', ['data' => $addressData->getData()]);
+//Address
+$addressData = [
+    'region' => 'CA',
+    'region_id' => '12',
+    'postcode' => '11111',
+    'lastname' => 'lastname',
+    'firstname' => 'firstname',
+    'street' => 'street',
+    'city' => 'Los Angeles',
+    'email' => 'admin@example.com',
+    'telephone' => '11111111',
+    'country_id' => 'US'
+];
+
+$billingAddress = $objectManager->create(Address::class, ['data' => $addressData]);
 $billingAddress->setAddressType('billing');
 
 $shippingAddress = clone $billingAddress;
 $shippingAddress->setId(null)->setAddressType('shipping');
 
-$payment = $objectManager->create('Magento\Sales\Model\Order\Payment');
+/** @var Payment $payment */
+$payment = $objectManager->create(Payment::class);
 $payment->setMethod('checkmo');
 
-/** @var \Magento\Sales\Model\Order\Item $orderItem */
-$orderItem = $objectManager->create('Magento\Sales\Model\Order\Item');
-$orderItem->setProductId($product->getId())->setQtyOrdered(2);
-$orderItem->setBasePrice($product->getPrice());
-$orderItem->setPrice($product->getPrice());
-$orderItem->setRowTotal($product->getPrice());
-$orderItem->setProductType('simple');
+/** @var Item $orderItem */
+$orderItem = $objectManager->create(Item::class);
+$orderItem->setProductId($product->getId())
+    ->setQtyOrdered(2)
+    ->setBasePrice($product->getPrice())
+    ->setPrice($product->getPrice())
+    ->setRowTotal($product->getPrice())
+    ->setProductType('simple')
+    ->setName($product->getName())
+    ->setSku($product->getSku());
 
-/** @var \Magento\Sales\Model\Order $order */
-$order = $objectManager->create('Magento\Sales\Model\Order');
-$order->setIncrementId(
-    '100000001'
-)->setState(
-    \Magento\Sales\Model\Order::STATE_PROCESSING
-)->setStatus(
-    $order->getConfig()->getStateDefaultStatus(\Magento\Sales\Model\Order::STATE_PROCESSING)
-)->setSubtotal(
-    100
-)->setGrandTotal(
-    100
-)->setBaseSubtotal(
-    100
-)->setBaseGrandTotal(
-    100
-)->setCustomerIsGuest(
-    true
-)->setCustomerEmail(
-    'customer@null.com'
-)->setBillingAddress(
-    $billingAddress
-)->setShippingAddress(
-    $shippingAddress
-)->setStoreId(
-    $objectManager->get('Magento\Store\Model\StoreManagerInterface')->getStore()->getId()
-)->addItem(
-    $orderItem
-)->setPayment(
-    $payment
-);
-$order->save();
+/** @var Order $order */
+$order = $objectManager->create(Order::class);
+$order->setIncrementId('100000001')
+    ->setState(Order::STATE_PROCESSING)
+    ->setStatus($order->getConfig()->getStateDefaultStatus(Order::STATE_PROCESSING))
+    ->setSubtotal(100)
+    ->setGrandTotal(100)
+    ->setBaseSubtotal(100)
+    ->setBaseGrandTotal(100)
+    ->setCustomerIsGuest(true)
+    ->setCustomerEmail('customer@null.com')
+    ->setBillingAddress($billingAddress)
+    ->setShippingAddress($shippingAddress)
+    ->setStoreId($objectManager->get(StoreManagerInterface::class)->getStore()->getId())
+    ->addItem($orderItem)
+    ->setPayment($payment);
+
+
+/** @var OrderRepositoryInterface $orderRepository */
+$orderRepository = $objectManager->create(OrderRepositoryInterface::class);
+$orderRepository->save($order);
+
+/** @var InvoiceManagementInterface $orderService */
+$orderService = $objectManager->create(InvoiceManagementInterface::class);
+/** @var InvoiceInterface $invoice */
+$invoice = $orderService->prepareInvoice($order);
+$invoice->register();
+$order->setIsInProcess(true);
+$transactionSave = $objectManager->create(Transaction::class);
+$transactionSave->addObject($invoice)->addObject($order)->save();
