@@ -6,9 +6,9 @@ use Magento\Framework\ObjectManagerInterface;
 use Magento\Sales\Api\CreditmemoRepositoryInterface;
 use Magento\Sales\Api\Data\CreditmemoInterface;
 use Magento\Sales\Api\Data\CreditmemoItemInterface;
+use PHPUnit\Framework\TestCase;
 use SnowIO\ExtendedSalesRepositories\Api\CreditmemoByOrderIncrementIdInterface;
 use SnowIO\ExtendedSalesRepositories\Exception\SnowCreditMemoException;
-use SnowIO\ExtendedSalesRepositories\Test\TestCase;
 
 class CreditmemoByOrderIncrementIdTest extends TestCase
 {

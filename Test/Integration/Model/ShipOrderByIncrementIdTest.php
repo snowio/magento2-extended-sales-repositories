@@ -8,9 +8,9 @@ use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Api\ShipmentRepositoryInterface;
 use Magento\Sales\Model\Order\Item;
 use Magento\TestFramework\Helper\Bootstrap;
+use PHPUnit\Framework\TestCase;
 use SnowIO\ExtendedSalesRepositories\Api\ShipOrderByIncrementIdInterface;
 use SnowIO\ExtendedSalesRepositories\Model\LoadOrderByIncrementIdTrait;
-use SnowIO\ExtendedSalesRepositories\Test\TestCase;
 
 class ShipOrderByIncrementIdTest extends TestCase
 {
