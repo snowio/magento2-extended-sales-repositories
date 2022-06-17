@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": "^7.4",
+        "php": "^7.4||^8.1",
         "magento/module-sales": "^103",
         "magento/framework": "^103"
     },
